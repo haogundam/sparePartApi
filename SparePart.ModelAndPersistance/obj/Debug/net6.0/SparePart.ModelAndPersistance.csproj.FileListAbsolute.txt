@@ -1,0 +1,56 @@
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.deps.json
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.runtimeconfig.json
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.AssemblyReference.cache
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfoInputs.cache
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfo.cs
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.CoreCompileInputs.cache
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\refint\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.genruntimeconfig.cache
+C:\Users\huanj\OneDrive\Desktop\SparePart.ModelAndPersistance\SparePart.ModelAndPersistance\obj\Debug\net6.0\ref\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.deps.json
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.runtimeconfig.json
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.AssemblyReference.cache
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfoInputs.cache
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfo.cs
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.CoreCompileInputs.cache
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\refint\SparePart.ModelAndPersistance.dll
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.genruntimeconfig.cache
+C:\Users\huanj\OneDrive\Desktop\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\ref\SparePart.ModelAndPersistance.dll
+D:\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.deps.json
+D:\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.runtimeconfig.json
+D:\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.dll
+D:\SparePartApp\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.AssemblyReference.cache
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.GeneratedMSBuildEditorConfig.editorconfig
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfoInputs.cache
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfo.cs
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.CoreCompileInputs.cache
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.dll
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\refint\SparePart.ModelAndPersistance.dll
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.genruntimeconfig.cache
+D:\SparePartApp\SparePart.ModelAndPersistance\obj\Debug\net6.0\ref\SparePart.ModelAndPersistance.dll
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.deps.json
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.runtimeconfig.json
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\bin\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.AssemblyReference.cache
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfoInputs.cache
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.AssemblyInfo.cs
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.csproj.CoreCompileInputs.cache
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.dll
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\refint\SparePart.ModelAndPersistance.dll
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.pdb
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\SparePart.ModelAndPersistance.genruntimeconfig.cache
+C:\Users\User\Desktop\Intern DIploma\Testing\SparePart\SparePart.ModelAndPersistance\obj\Debug\net6.0\ref\SparePart.ModelAndPersistance.dll
