@@ -16,33 +16,47 @@ namespace SparePart.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IMapper _mapper;
-        const int PageSize = 10;
-        public CustomerController(ICustomerService customerService, ICustomerRepository customerRepository, IMapper mapper)
+        const int PageSize = 3;
+        public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
-            _customerRepository = customerRepository;
-            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<(IEnumerable<CustomersInfo>,int)>> GetAllCustomers([FromQuery] string? name, int pageNumber)
+        public async Task<ActionResult<IEnumerable<CustomersInfo>>> SearchCustomers([FromQuery] string? name, int pageNumber = 1)
         {
-            var (customerEntities, paginationMetadata) = await _customerRepository.SearchCustomerByCustomerName(name, PageSize, pageNumber);
+            var (customerEntities, paginationMetadata) = await _customerService.SearchCustomerByName(name, PageSize, pageNumber);
+
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1 )
+            {
+                pageNumber = 1;
+                (customerEntities, paginationMetadata) = await _customerService.SearchCustomerByName(name, PageSize, pageNumber);
+            }
 
             if (customerEntities == null)
             {
                 return NotFound();
             }
-            
-            _mapper.Map<IEnumerable<CustomersInfo>>(customerEntities);
 
             Response.Headers.Add("X-Pagination",
                   System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
-            return Ok((_mapper.Map<IEnumerable<CustomersInfo>>(customerEntities), paginationMetadata.TotalPageCount));
+            return Ok(customerEntities);
 
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CustomerDto>> RegisterCustomer([FromBody] RegisterCustomerRequest request)
+        {
+            var validation =  await _customerService.ValidateCustomerRegistration(request);
+            if (validation == false)
+            {
+                return BadRequest("One of the field is empty");
+            }
+
+            await _customerService.RegisterNewCustomer(request);
+
+            return Ok("New Customer Registered!!");
         }
 
         //[HttpGet("{customerid}")]
@@ -56,24 +70,6 @@ namespace SparePart.Controllers
 
         //    return Ok(_mapper.Map<QuotationResponse>(customer));
         //}
-
-
-
-
-        [HttpPost]
-        public async Task<ActionResult<CustomerDto>> RegisterCustomer([FromBody] RegisterCustomerRequest request)
-        {
-            if (request.CustomerName == null || request.CustomerContact == null || request.CustomerEmail == null || request.CustomerAddress == null)
-            {
-                return BadRequest("One of the field is EMPTY !!");
-            }
-
-            await _customerService.RegisterNewCustomer(request);
-
-            return Ok("New Customer Registered!!");
-        }
-
-
 
 
 

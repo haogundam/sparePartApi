@@ -93,7 +93,7 @@ namespace SparePart.ModelAndPersistance.Repository
             return (partsToReturn, paginationMetadata);
         }
 
-        public async Task<Customer> GetCustomerByCustomerId(int customerId)
+        public async Task<Customer?> GetCustomerByCustomerId(int customerId)
         {
             
             return await _context.Customers

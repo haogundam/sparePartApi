@@ -31,39 +31,7 @@ namespace SparePart.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetAllParts(string? sku, int pageNumber)
         {
-            // no input SKU
-            if (string.IsNullOrWhiteSpace(sku))
-            {
-                var (allParts, paginationMetadata) = await _partRepository.GetAllParts(PageSize, pageNumber);
 
-                if (allParts == null)
-                {
-                    return NotFound();
-                }
-
-                var partResponses = new List<PartResponse>();
-
-                foreach (var part in allParts)
-                {
-                    var supplierName = await _partRepository.GetSupplierNameByPartId(part.PartId);
-                    var warehouseName = await _partRepository.GetWarehouseNameByPartId(part.PartId);
-                    var quantityLeft = await _partRepository.GetPartQuantity(part.PartId);
-
-                    var partResponse = _mapper.Map<PartResponse>(part);
-
-                    partResponse.SupplierName = supplierName;
-                    partResponse.WarehouseName = warehouseName;
-                    partResponse.Quantity = quantityLeft;
-
-                    partResponses.Add(partResponse);
-                }
-
-                Response.Headers.Add("X-Pagination",
-                     System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
-                return Ok(partResponses);
-            }
-            else // input SKU
-            {
                 var (partsBySKU, skuPaginationMetadata) = await _partRepository.SearchPartsBySKU(sku, PageSize, pageNumber);
 
                 if (partsBySKU == null)
@@ -117,7 +85,7 @@ namespace SparePart.Controllers
             }
 
 
-        }
+        
 
 
 
