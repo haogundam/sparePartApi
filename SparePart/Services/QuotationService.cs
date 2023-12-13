@@ -14,7 +14,6 @@ namespace SparePart.Services
         private readonly ICustomerRepository _customerRepository;
         private readonly IQuotationRepository _quotationRepository;
         private readonly IMapper _mapper;
-        const int PageSize = 10;
 
         public QuotationService(IQuotationPartRepository quotationPartRepository,ICustomerRepository customerRepository, IQuotationRepository quotationRepository, IMapper mapper)
         {
@@ -30,10 +29,10 @@ namespace SparePart.Services
             return quoteList;
         }
 
-        public async Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId,int quoteNo, int pageNumber)
+        public async Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId,int quoteNo,int pageSize, int pageNumber)
         {
             var quoteList = await _quotationRepository.GetQuoteListByQuoteNo(customerId, quoteNo);
-            var (quotationPart, partPaginationMetadata) = await _quotationPartRepository.GetAllQuotationPartFromQuoteNo(quoteNo, PageSize, pageNumber);
+            var (quotationPart, partPaginationMetadata) = await _quotationPartRepository.GetAllQuotationPartFromQuoteNo(quoteNo, pageSize, pageNumber);
 
             var response = new QuotationPartResponse
             {
@@ -41,17 +40,20 @@ namespace SparePart.Services
                 QuoteDate = quoteList.QuoteDate.ToString("yyy-MM-dd"),
                 TotalAmount = quoteList.TotalAmount,
                 Parts = _mapper.Map<ICollection<PartsInQuotationList>>(quotationPart),
-                TotalPageCount = partPaginationMetadata.TotalPageCount
             };
 
             return (response, partPaginationMetadata);
         }
 
-        public async Task<(QuotationListResponse, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId, int pageNumber)
+        public async Task<(QuotationListResponse?, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId,int pageSize, int pageNumber)
         {
             var customer = await _customerRepository.GetCustomerByCustomerId(customerId);
+            if (customer == null)
+            {
+                return (null,null);
+            }
 
-            var (quotationList, paginationMetadata) = await _quotationRepository.GetQuoteListByCustomerId(customerId, PageSize, pageNumber);
+            var (quotationList, paginationMetadata) = await _quotationRepository.GetQuoteListByCustomerId(customerId, pageSize, pageNumber);
 
             var response = new QuotationListResponse
             {
@@ -66,16 +68,17 @@ namespace SparePart.Services
                     Status = q.Status
                 }).ToList(),
 
-                TotalPageCount = paginationMetadata.TotalPageCount
             };
 
             return (response, paginationMetadata);
 
         }
 
-        public async Task CreateQuoteListByCustomerId(int customerId)
+        public async Task<QuotationList?> CreateQuoteListByCustomerId(int customerId)
         {
             var customer = await _customerRepository.GetCustomerByCustomerId(customerId);
+            if (customer == null) { return null; }
+
 
             var newQuoteLists = new QuotationListForCreation
             {
@@ -92,8 +95,10 @@ namespace SparePart.Services
 
             var newQuoteList = _mapper.Map<QuotationList>(newQuoteLists);
 
-
             await _quotationRepository.CreateQuotationList(newQuoteList);
+
+            return newQuoteList;
+
         }
 
         public async Task SubmitQuotationList(QuotationList quotationList)

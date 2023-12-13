@@ -23,7 +23,9 @@ namespace SparePart.Profile
             CreateMap<QuotationList, QuotationListForSubmition>();
 
             CreateMap<Part, PartResponse>()
-                .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => src.SellingPrice));
+                .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => src.SellingPrice))
+                .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.SupplierName))
+                ;
         }
 
     }

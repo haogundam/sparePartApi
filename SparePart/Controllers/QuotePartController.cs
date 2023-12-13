@@ -50,7 +50,7 @@ namespace SparePart.Controllers
                 return NotFound();
             }
 
-            var (quotationPart, partPaginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, pageNumber);
+            var (quotationPart, partPaginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo,PageSize, pageNumber);
 
             Response.Headers.Add("X-Pagination",
                      System.Text.Json.JsonSerializer.Serialize(partPaginationMetadata));

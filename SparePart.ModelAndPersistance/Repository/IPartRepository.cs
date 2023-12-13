@@ -24,6 +24,8 @@ namespace SparePart.ModelAndPersistance.Repository
         Task<string> GetWarehouseNameByPartId(int partId);
        
 
-        Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsBySKU(string searchQuery, int pageSize, int pageNumber);
+        Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsBySKU(string? searchQuery, int pageSize, int pageNumber);
+
+        Task<(IEnumerable<Part>, PaginationMetadata)> GetPartsSameCategoryBySKU(string? searchQuery, int pageSize, int pageNumber);
     }
 }

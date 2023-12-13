@@ -16,7 +16,7 @@ namespace SparePart.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
-        const int PageSize = 3;
+        const int PageSize = 10;
         public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
@@ -29,7 +29,7 @@ namespace SparePart.Controllers
 
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1 )
             {
-                pageNumber = 1;
+                pageNumber = paginationMetadata.TotalPageCount;
                 (customerEntities, paginationMetadata) = await _customerService.SearchCustomerByName(name, PageSize, pageNumber);
             }
 

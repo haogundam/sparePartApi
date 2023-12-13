@@ -8,7 +8,5 @@ namespace SparePart.Dto.Response
         public string CustomerName { get; set; } = string.Empty;
         public ICollection<QuotationResponse> QuotationList { get; set; } = new List<QuotationResponse>();
 
-        public int TotalPageCount { get; set; }
-
     }
 }

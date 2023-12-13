@@ -104,10 +104,10 @@ namespace SparePart.ModelAndPersistance.Repository
             return (partsToReturn, paginationMetadata);
         }
 
-        public async Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsBySKU(string searchQuery, int pageSize, int pageNumber)
+        public async Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsBySKU(string? searchQuery, int pageSize, int pageNumber)
         {
             var collection = _context.Parts.AsQueryable();
-         //       .Include(part => part.Category);
+         
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
@@ -122,11 +122,47 @@ namespace SparePart.ModelAndPersistance.Repository
                 totalItemCount, pageSize, pageNumber);
 
             var partsToReturn = await collection.OrderBy(c => c.PartName)
+                .Include(part => part.Category)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
 
             return (partsToReturn, paginationMetadata);
         }
+
+        public async Task<(IEnumerable<Part>, PaginationMetadata)> GetPartsSameCategoryBySKU(string? searchQuery, int pageSize, int pageNumber)
+        {
+            var collection = _context.Parts.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                var SKUs = collection
+                    .Include(a => a.Category)
+                    .Where(a => a.SKU.Contains(searchQuery))
+                    .ToList();
+
+                var categoryNames = SKUs.Select(a => a.Category.CategoryId).Distinct();
+                collection = collection
+                    .Include(a => a.Category)
+                    .Where(a => categoryNames.Contains(a.Category.CategoryId) 
+                    && !a.SKU.Contains(searchQuery)
+                    );
+            }
+
+
+            var totalItemCount = await collection.CountAsync();
+
+            var paginationMetadata = new PaginationMetadata(
+                totalItemCount, pageSize, pageNumber);
+
+            var partsToReturn = await collection.OrderBy(c => c.PartName)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (partsToReturn, paginationMetadata);
+        }
+
     }
 }

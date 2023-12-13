@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto.Response;
 using SparePart.Services;
+using System.Xml.Linq;
 
 namespace SparePart.Controllers
 {
@@ -10,7 +11,7 @@ namespace SparePart.Controllers
     {
         private readonly IQuotationService _quotationService;
         private readonly ICustomerService _customerService;
-
+        const int PageSize = 10;
         public QuotationController( IQuotationService quotationService, ICustomerService customerService)
         {
 
@@ -23,14 +24,20 @@ namespace SparePart.Controllers
         {
             if (await _customerService.CheckCustomerExist(customerId) == false)
             {
-                return NotFound();
+                return NotFound("No this customer");
             }
 
-            var (quotationList, paginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, pageNumber);
+            var (quotationList, paginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize,pageNumber);
 
             if (quotationList == null)
             {
-                return NotFound();
+                return NotFound("");
+            }
+
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
+            {
+                pageNumber = paginationMetadata.TotalPageCount;
+                (quotationList, paginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize, pageNumber);
             }
 
             Response.Headers.Add("X-Pagination",
@@ -44,14 +51,13 @@ namespace SparePart.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateNewQuotationList(int customerId)
         {
-            if (await _customerService.CheckCustomerExist(customerId) == false)
+
+            if (await _quotationService.CreateQuoteListByCustomerId(customerId) == null)
             {
-                return NotFound();
+                return NotFound("No this customer Id");
             }
 
-            await _quotationService.CreateQuoteListByCustomerId(customerId);
-
-            return Ok();
+            return Ok("New QuoteList Created!");
 
         }
 

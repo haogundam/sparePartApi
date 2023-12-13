@@ -9,11 +9,11 @@ namespace SparePart.Services
     {
         Task<QuotationList> GetCustomerQuoteListByQuoteNo(int customerId, int quoteNo);
 
-        Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageNumber);
+        Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageSize, int pageNumber);
 
-        Task<(QuotationListResponse, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId, int pageNumber);
+        Task<(QuotationListResponse?, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId, int pageSize, int pageNumber);
 
-        Task CreateQuoteListByCustomerId(int customerId);
+        Task<QuotationList?> CreateQuoteListByCustomerId(int customerId);
 
         Task SubmitQuotationList(QuotationList quotationList);
 
