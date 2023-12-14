@@ -5,6 +5,7 @@ using SparePart.Dto.Response;
 using SparePart.ModelAndPersistance;
 using SparePart.ModelAndPersistance.Entities;
 using SparePart.ModelAndPersistance.Repository;
+using SparePart.Services;
 
 namespace SparePart.Controllers
 {
@@ -12,94 +13,51 @@ namespace SparePart.Controllers
     [ApiController]
     public class PartController : ControllerBase
     {
-        private readonly IQuotationRepository _quotationRepository;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IQuotationPartRepository _quotationPartRepository;
-        private readonly IPartRepository _partRepository;
-        private readonly IMapper _mapper;
-        const int PageSize = 10;
-        public PartController(IQuotationRepository quotationRepository, ICustomerRepository customerRepository,
-            IQuotationPartRepository quotationPartRepository, IPartRepository partRepository, IMapper mapper)
+        private readonly IPartService _partService;
+        const int PageSize = 1;
+        public PartController(IPartService partService)
         {
-            _quotationRepository = quotationRepository;
-            _customerRepository = customerRepository;
-            _quotationPartRepository = quotationPartRepository;
-            _partRepository = partRepository;
-            _mapper = mapper;
+            _partService = partService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetAllParts(string? sku, int pageNumber)
         {
-            var (parts, paginationMetadata) = await _partRepository.SearchPartsBySKU(sku, PageSize, pageNumber);
+            var (parts, paginationMetadata) = await _partService.GetPartsBySKU(sku, PageSize, pageNumber);
             if (parts == null) { return NotFound(); }
 
-            var skuPartResponses = new List<PartResponse>();
 
-            foreach (var part in parts)
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
-                var supplierName = await _partRepository.GetSupplierNameByPartId(part.PartId);
-                var warehouseName = await _partRepository.GetWarehouseNameByPartId(part.PartId);
-                var quantityLeft = await _partRepository.GetPartQuantity(part.PartId);
-
-                var partResponse = _mapper.Map<PartResponse>(part);
-
-                partResponse.SupplierName = supplierName;
-                partResponse.WarehouseName = warehouseName;
-                partResponse.Quantity = quantityLeft;
-
-                skuPartResponses.Add(partResponse);
+                pageNumber = paginationMetadata.TotalPageCount;
+                (parts, paginationMetadata) = await _partService.GetPartsBySKU(sku, PageSize, pageNumber);
             }
 
+
             Response.Headers.Add("X-Pagination",
-                 System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
+                System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
-
-
-            return Ok(skuPartResponses);
+            return Ok(parts);
 
         }
-
-
-
-
-
-
-
-
-
-
 
         [HttpGet("category")]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetSameCategoryParts(string? sku, int pageNumber)
         {
-            var (parts, paginationMetadata) = await _partRepository.GetPartsSameCategoryBySKU(sku, PageSize, pageNumber);
+            var (parts, paginationMetadata) = await _partService.GetAllPartsWithSameCategory(sku, PageSize, pageNumber);
             if (parts == null) { return NotFound(); }
 
-            var skuPartResponses = new List<PartResponse>();
-
-            foreach (var part in parts)
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
-                var supplierName = await _partRepository.GetSupplierNameByPartId(part.PartId);
-                var warehouseName = await _partRepository.GetWarehouseNameByPartId(part.PartId);
-                var quantityLeft = await _partRepository.GetPartQuantity(part.PartId);
-
-                var partResponse = _mapper.Map<PartResponse>(part);
-
-                partResponse.SupplierName = supplierName;
-                partResponse.WarehouseName = warehouseName;
-                partResponse.Quantity = quantityLeft;
-
-                skuPartResponses.Add(partResponse);
+                pageNumber = paginationMetadata.TotalPageCount;
+                (parts, paginationMetadata) = await _partService.GetPartsBySKU(sku, PageSize, pageNumber);
             }
 
             Response.Headers.Add("X-Pagination",
                  System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
-            
-
-            return Ok(skuPartResponses);
-
+            return Ok(parts);
+        }
 
             //var (partsBySKU, skuPaginationMetadata) = await _partRepository.SearchPartsBySKU(sku, PageSize, pageNumber);
 
@@ -151,7 +109,7 @@ namespace SparePart.Controllers
             //    .GroupBy(p => p.PartId).Select(g => g.First()).ToList();
 
             //return Ok(mergedPartResponses);   
-        }
+        
 
 
 

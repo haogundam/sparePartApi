@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SparePart.Dto.Request;
 using SparePart.Dto.Response;
+using SparePart.ModelAndPersistance;
 using SparePart.ModelAndPersistance.Entities;
 using SparePart.ModelAndPersistance.Models;
 using SparePart.ModelAndPersistance.Repository;
 using SparePart.Services;
+using System.Xml.Linq;
 
 namespace SparePart.Controllers
 {
-    [Route("api/customers/{customerid}/quotations/{quoteNo}")]
+    [Route("api/customers/{customerId}/quotations/{quoteNo}")]
     [ApiController]
     public class QuotePartController : ControllerBase
     {
@@ -38,48 +41,50 @@ namespace SparePart.Controllers
         [HttpGet]
         public async Task<ActionResult<QuotationPartResponse>> GetAllPartsInQuoationListById(int customerId, int quoteNo, int pageNumber)
         {
-            if (await _customerService.CheckCustomerExist(customerId)== false)
+            if (await _customerService.CheckCustomerExist(customerId) == false)
             {
-                return NotFound();
+                return NotFound("No this customer id");
             }
 
             var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
 
             if (quoteListByQuoteNo == null)
             {
-                return NotFound();
+                return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
             }
 
-            var (quotationPart, partPaginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo,PageSize, pageNumber);
+            var (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo,PageSize, pageNumber);
+
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
+            {
+                pageNumber = paginationMetadata.TotalPageCount;
+                (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, pageNumber);
+            }
 
             Response.Headers.Add("X-Pagination",
-                     System.Text.Json.JsonSerializer.Serialize(partPaginationMetadata));
+                     System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(quotationPart);
 
         }
 
 
-
-
         [HttpPost]
-        public async Task<ActionResult> AddQuotationPart([FromBody]QuotationPartDto quotationPartDto)
+        public async Task<ActionResult> AddNewQuotePart([FromQuery] int customerId, int quoteNo, [FromBody] QuotePartAdd quotePartAdd)
         {
-            if (!await _quotePartService.CheckPartExists(quotationPartDto.PartId))
+            if (await _customerService.CheckCustomerExist(customerId) == false)
             {
-                return BadRequest($"Part with ID {quotationPartDto.PartId} was not found.");
+                return NotFound("No this customer id");
             }
 
-            bool quantityCheck, priceCheck;
-            var quotationPart = new QuotationPart
-            {
-                QuoteNo = quotationPartDto.QuoteNo,
-                PartId = quotationPartDto.PartId,
-                Quantity = quotationPartDto.Quantity,
-                UnitPrice = quotationPartDto.UnitPrice
-            };
+            var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
 
-            (quantityCheck, priceCheck) = await _quotePartService.AddQuotationPartAsync(quotationPart);
+            if (quoteListByQuoteNo == null)
+            {
+                return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
+            }
+
+            var (quantityCheck, priceCheck) = await _quotePartService.AddQuotationPartAsync(quoteNo, quotePartAdd);
 
             if (!quantityCheck && !priceCheck)
             {
@@ -94,18 +99,36 @@ namespace SparePart.Controllers
                 return BadRequest("The selling price is lower than the base price.");
             }
 
-            return Ok(quotationPartDto);
+            return Ok($"PartID {quotePartAdd.PartId} added to QuoteNo {quoteNo}");
+
+
         }
 
-        [HttpDelete("remove")]
-        public async Task<ActionResult> RemoveQuotationPart(int quotePartId) {
-            if (!await _quotePartService.CheckQuotePartExists(quotePartId))
+        [HttpDelete("quoteparts/{quotePartId}")]
+        public async Task<ActionResult> RemoveQuotePart([FromQuery] int customerId, int quoteNo, int quotePartId)
+        {
+            if (await _customerService.CheckCustomerExist(customerId) == false)
             {
-                return BadRequest("Part with " + quotePartId + " id was not found.");
+                return NotFound($"No this customer id");
             }
+
+            var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
+
+            if (quoteListByQuoteNo == null)
+            {
+                return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
+            }
+
+            if (await _quotePartService.CheckQuotePartExists(quotePartId) == false)
+            {
+                return NotFound($"No this QuotePartId{quotePartId}");
+            }
+
             _quotePartService.RemoveQuotationPart(quotePartId);
-            return Ok();
+                return Ok("Successfuly  remove");
+
         }
+
 
         [HttpPatch("submit")]
         public async Task<ActionResult> SubmitQuotationList(int customerId, int quoteNo)
@@ -124,8 +147,60 @@ namespace SparePart.Controllers
 
             await _quotationService.SubmitQuotationList(quoteListByQuoteNo);
 
-            return Ok();
+            return Ok("Submitted!");
         }
+
+
+        //[HttpPost]
+        //public async Task<ActionResult<QuotationPart>> AddQuotationPart([FromQuery]int customerId, int quoteNo,[FromBody]QuotePartAdd quotePartAdd)
+        //{
+        //    if (await _customerService.CheckCustomerExist(customerId) == false)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
+
+        //    if (quoteListByQuoteNo == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    bool quantityCheck, priceCheck;
+
+        //     _mapper.Map<QuotationPart>(quotePartAdd);
+        //    var quotationPart = _mapper.Map<QuotationPart>(quoteNo);
+
+
+        //    (quantityCheck, priceCheck) = await _quotePartService.AddQuotationPartAsync(quotationPart);
+
+        //    if (!quantityCheck && !priceCheck)
+        //    {
+        //        return BadRequest("Quantity exceeds available stock and the selling price is lower than the base price.");
+        //    }
+        //    else if (!quantityCheck)
+        //    {
+        //        return BadRequest("Quantity exceeds available stock.");
+        //    }
+        //    else if (!priceCheck)
+        //    {
+        //        return BadRequest("The selling price is lower than the base price.");
+        //    }
+
+        //    return Ok(quotationPart);
+        //}
+
+        //[HttpDelete]
+        //public async Task<ActionResult> RemoveQuotationPart(int quotePartId) {
+        //    if (!await _quotePartService.CheckQuotePartExists(quotePartId))
+        //    {
+        //        return BadRequest("Part with " + quotePartId + " id was not found.");
+        //    }
+        //    _quotePartService.RemoveQuotationPart(quotePartId);
+        //    return Ok();
+        //}
+
+
 
     }
 }

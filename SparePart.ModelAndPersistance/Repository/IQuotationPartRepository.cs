@@ -11,6 +11,8 @@ namespace SparePart.ModelAndPersistance.Repository
 {
     public interface IQuotationPartRepository
     {
+
+        
         Task<bool> QuotationPartExists(int quotationPartId);
 
         Task<QuotationPart> GetQuotationPartById(int quotePartId);

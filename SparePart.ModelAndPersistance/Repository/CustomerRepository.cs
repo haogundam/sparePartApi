@@ -102,7 +102,12 @@ namespace SparePart.ModelAndPersistance.Repository
 
         public async Task<bool> CustomerExistsAsync(int customerId)
         {
-            return await _context.Customers.AnyAsync(c => c.CustomerId == customerId);
+            var customer = await _context.Customers.AnyAsync(c => c.CustomerId == customerId);
+            if (customer == false)
+            {
+                return false;
+            }
+            return true;
         }
 
 

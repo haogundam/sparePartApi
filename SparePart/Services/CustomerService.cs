@@ -21,7 +21,7 @@ namespace SparePart.Services
         {
             var exists = await _customerRepository.CustomerExistsAsync(customerId);
 
-            if (exists == null) { return false; }
+            if (exists == false) { return false; }
 
             return true;
         }
@@ -29,9 +29,7 @@ namespace SparePart.Services
         public async Task<(IEnumerable<CustomersInfo>?,PaginationMetadata)> SearchCustomerByName(string? name,int pageSize, int pageNumber)
         {
             var (customerEntities, paginationMetadata) = await _customerRepository.SearchCustomerByCustomerName(name, pageSize, pageNumber);
-            
-      
-            
+
             if (customerEntities == null)
             {
                 return (null, paginationMetadata);

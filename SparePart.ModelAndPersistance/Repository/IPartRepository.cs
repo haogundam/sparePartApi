@@ -1,4 +1,5 @@
-﻿using SparePart.ModelAndPersistance.Entities;
+﻿using SparePart.ModelAndPersistance.Dtos;
+using SparePart.ModelAndPersistance.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,5 +28,13 @@ namespace SparePart.ModelAndPersistance.Repository
         Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsBySKU(string? searchQuery, int pageSize, int pageNumber);
 
         Task<(IEnumerable<Part>, PaginationMetadata)> GetPartsSameCategoryBySKU(string? searchQuery, int pageSize, int pageNumber);
-    }
+
+
+        Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchAllPartsBySKU(string searchQuery, int pageSize, int pageNumber);
+        Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber);
+
+
+
+
+        }
 }

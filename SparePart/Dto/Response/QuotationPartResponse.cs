@@ -8,7 +8,6 @@
         
         public ICollection<PartsInQuotationList> Parts { get; set; } = new List<PartsInQuotationList>();
 
-        public int TotalPageCount { get; set; }
 
     }
 }

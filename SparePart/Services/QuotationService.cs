@@ -23,9 +23,11 @@ namespace SparePart.Services
             _mapper = mapper;
         }
 
-        public async Task<QuotationList> GetCustomerQuoteListByQuoteNo(int customerId, int quoteNo)
+        public async Task<QuotationList?> GetCustomerQuoteListByQuoteNo(int customerId, int quoteNo)
         {
             var quoteList = await _quotationRepository.GetQuoteListByQuoteNo(customerId, quoteNo);
+            if (quoteList == null) { return null; }
+
             return quoteList;
         }
 

@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using SparePart.ModelAndPersistance.Context;
+using SparePart.ModelAndPersistance.Dtos;
 using SparePart.ModelAndPersistance.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,10 +15,12 @@ namespace SparePart.ModelAndPersistance.Repository
     public class PartRepository : IPartRepository
     {
         private readonly SparePartContext _context;
+        private readonly IMapper _mapper;
 
-        public PartRepository(SparePartContext sparePartContext)
+        public PartRepository(SparePartContext sparePartContext, IMapper mapper)
         {
             _context = sparePartContext ?? throw new ArgumentNullException(nameof(sparePartContext));
+            _mapper = mapper;
         }
 
 
@@ -159,6 +164,73 @@ namespace SparePart.ModelAndPersistance.Repository
             var partsToReturn = await collection.OrderBy(c => c.PartName)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
+                .ToListAsync();
+
+            return (partsToReturn, paginationMetadata);
+        }
+
+        // NEW
+        public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchAllPartsBySKU(string searchQuery, int pageSize, int pageNumber)
+        {
+            var collection = _context.Parts.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                collection = collection
+                    .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+            }
+
+            var totalItemCount = await collection.CountAsync();
+
+            var paginationMetadata = new PaginationMetadata(
+                totalItemCount, pageSize, pageNumber);
+
+            // Use AutoMapper's ProjectTo for efficient projection
+            var partsToReturn = await collection
+                .Include(a => a.Storages)
+                .Include(a => a.Supplier)
+                .OrderBy(c => c.PartName)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ProjectTo<PartForAdditionalInfoDto>(_mapper.ConfigurationProvider)  // Assuming you have a PartDto
+                .ToListAsync();
+
+            return (partsToReturn, paginationMetadata);
+        }
+
+        public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber)
+        {
+            var collection = _context.Parts.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.Trim();
+                var SKUs = collection
+                    .Include(a => a.Category)
+                    .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+                var categoryNames = SKUs.Select(a => a.Category.CategoryId).Distinct();
+                collection = collection
+                    .Include(a => a.Category)
+                    .Where(a => categoryNames.Contains(a.Category.CategoryId)
+                    && !a.SKU.Contains(searchQuery)
+                    );
+            }
+
+            var totalItemCount = await collection.CountAsync();
+
+            var paginationMetadata = new PaginationMetadata(
+                totalItemCount, pageSize, pageNumber);
+
+            // Use AutoMapper's ProjectTo for efficient projection
+            var partsToReturn = await collection
+                .Include(a => a.Storages)
+                .Include(a => a.Supplier)
+                .OrderBy(c => c.PartName)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ProjectTo<PartForAdditionalInfoDto>(_mapper.ConfigurationProvider)  // Assuming you have a PartDto
                 .ToListAsync();
 
             return (partsToReturn, paginationMetadata);

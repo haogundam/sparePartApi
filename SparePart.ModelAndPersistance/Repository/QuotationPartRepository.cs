@@ -33,6 +33,21 @@ namespace SparePart.ModelAndPersistance.Repository
             return quotationPart;
         }
 
+
+        //public async Task<bool> CheckPartExistinQuoteListByPartId(int quotePartId, int partId)
+        //{
+        //    var exists = await _context.QuotationParts
+        //        .Where(c => c.QuotePartId == quotePartId && c.PartId == partId)
+        //        .FirstOrDefaultAsync();
+        //    if (exists == null)
+        //    {
+        //        throw new InvalidOperationException($"PartID {partId} was not found in QuoteNo{quotePartId}");
+        //    }
+
+        //}
+
+
+
         public async Task<QuotationPart> GetQuotationPartById(int quotePartId)
         {
             var quotePart = await _context.QuotationParts.Where(c => c.QuotePartId == quotePartId).FirstOrDefaultAsync();

@@ -23,6 +23,7 @@ builder.Services.AddScoped<IQuotationPartRepository, QuotationPartRepository>();
 builder.Services.AddScoped<IQuotePartService, QuotePartService>();
 builder.Services.AddScoped<IQuotationService, QuotationService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPartService, PartService>();
 
 
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using SparePart.Dto.Request;
 using SparePart.ModelAndPersistance.Entities;
 using SparePart.ModelAndPersistance.Models;
 using SparePart.ModelAndPersistance.Repository;
@@ -9,30 +11,41 @@ namespace SparePart.Services
     {
         private readonly IPartRepository _partRepository;
         private readonly IQuotationPartRepository _quotationPartRepository;
+        private readonly IMapper _mapper;
 
-        public QuotePartService(IPartRepository partRepository, IQuotationPartRepository quotationPartRepository) 
+        public QuotePartService(IPartRepository partRepository, IQuotationPartRepository quotationPartRepository,IMapper mapper) 
         {
             _partRepository = partRepository ?? throw new ArgumentNullException(nameof(partRepository));
             _quotationPartRepository = quotationPartRepository ?? throw new ArgumentNullException(nameof(quotationPartRepository));
+            _mapper = mapper;
         }
-        public async Task<(bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(QuotationPart quotationPart)
+
+        public async Task<(bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd)
         {
-            var part = await _partRepository.GetPartById(quotationPart.PartId);
+            var part = await _partRepository.GetPartById(quotePartAdd.PartId);
 
             // Check if the quantity is valid
-            if (quotationPart.Quantity > await _partRepository.GetPartQuantity(part.PartId))
+            if (quotePartAdd.Quantity > await _partRepository.GetPartQuantity(part.PartId))
             {
                 return (isQuantityValid: false, isPriceValid: true);
             }
 
             // Check if the unit price is valid
-            if (quotationPart.UnitPrice > part.SellingPrice)
+            if (quotePartAdd.UnitPrice < part.BuyingPrice)
             {
                 return (isQuantityValid: true, isPriceValid: false);
             }
 
             // Both quantity and price are valid, add the QuotationPart
-            await _quotationPartRepository.AddQuotationPart(quotationPart);
+            var quotePart = new QuotationPart
+            { 
+                QuoteNo = quoteNo,
+                PartId= quotePartAdd.PartId,
+                Quantity = quotePartAdd.Quantity,
+                UnitPrice = quotePartAdd.UnitPrice,
+            };
+
+            await _quotationPartRepository.AddQuotationPart(quotePart);
             return (isQuantityValid: true, isPriceValid: true);
         }
 
