@@ -2,7 +2,7 @@
 
 namespace SparePart.ModelAndPersistance.Models
 {
-    public class CustomerDto
+    public class CustomerRegisterResponse
     {
         public int CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;

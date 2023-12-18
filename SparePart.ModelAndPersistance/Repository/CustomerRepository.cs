@@ -27,7 +27,7 @@ namespace SparePart.ModelAndPersistance.Repository
 
             if (exists)
             {
-                throw new InvalidOperationException("Customer with the same Customer name already exists.");
+                throw new InvalidOperationException("Customer with the same Customer info already exists.");
             }
 
             // Add the new customer to the context

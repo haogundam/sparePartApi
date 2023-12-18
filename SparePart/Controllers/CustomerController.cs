@@ -46,7 +46,7 @@ namespace SparePart.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CustomerDto>> RegisterCustomer([FromBody] RegisterCustomerRequest request)
+        public async Task<ActionResult<CustomerRegisterResponse>> RegisterCustomer([FromBody] RegisterCustomerRequest request)
         {
             var validation =  await _customerService.ValidateCustomerRegistration(request);
             if (validation == false)

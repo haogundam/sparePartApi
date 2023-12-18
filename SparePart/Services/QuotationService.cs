@@ -110,7 +110,6 @@ namespace SparePart.Services
             await _quotationRepository.UpdateQuotationList(quotationList);
         }
 
-
         public async Task UpdateTotalAmount(QuotationList quotationList)
         {
             double totalAmount = 0;

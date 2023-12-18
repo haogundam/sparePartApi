@@ -1,6 +1,6 @@
 ﻿using SparePart.Dto.Response;
 using SparePart.ModelAndPersistance;
-using SparePart.ModelAndPersistance.Dtos;
+using SparePart.ModelAndPersistance.Models;
 
 namespace SparePart.Services
 {
@@ -8,6 +8,5 @@ namespace SparePart.Services
     {
         Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> GetPartsBySKU(string? sku, int pageSize, int pageNumber);
         Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> GetAllPartsWithSameCategory(string? sku, int pageSize, int pageNumber);
-        Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> Test(string? sku, int pageSize, int pageNumber);
     }
 }

@@ -2,8 +2,8 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using SparePart.ModelAndPersistance.Context;
-using SparePart.ModelAndPersistance.Dtos;
 using SparePart.ModelAndPersistance.Entities;
+using SparePart.ModelAndPersistance.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -170,89 +170,113 @@ namespace SparePart.ModelAndPersistance.Repository
             return (partsToReturn, paginationMetadata);
         }
 
+
         // NEW
         public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchAllPartsBySKU(string searchQuery, int pageSize, int pageNumber)
         {
             var collection = _context.Parts.AsQueryable();
+            var hasAnyMatchingSKU = await collection
+                 .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+            if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
             {
                 searchQuery = searchQuery.Trim();
                 collection = collection
                     .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+                var totalItemCount = await _context.Storages
+               .Join(
+                   _context.Parts,
+                   storage => storage.PartId,
+                   part => part.PartId,
+                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+               )
+               .Where(result => result.SKU.Contains(searchQuery))
+               .Distinct()
+               .CountAsync();
+
+                var paginationMetadata = new PaginationMetadata(
+                    totalItemCount, pageSize, pageNumber);
+
+
+                var partsToReturn = await collection
+                  .Include(p => p.Supplier)
+                  .Include(p => p.Storages)
+                         .ThenInclude(s => s.Warehouse)
+                  .OrderBy(c => c.PartName)
+                  .SelectMany(p => p.Storages) // Flatten the Storages collection
+                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                  .Select(group => new PartForAdditionalInfoDto
+                  {
+                      SKU = group.First().Part.SKU,
+                      PartName = group.First().Part.PartName,
+                      SellingPrice = group.First().Part.SellingPrice,
+                      SupplierName = group.First().Part.Supplier.SupplierName,
+                      WarehouseName = group.First().Warehouse.WarehouseName,
+                      TotalQuantity = group.Sum(s => s.Quantity)
+                  })
+                  .Skip(pageSize * (pageNumber - 1))
+                  .Take(pageSize)
+                  .ToListAsync();
+
+                return (partsToReturn, paginationMetadata);
+            }
+            else if (!string.IsNullOrWhiteSpace(searchQuery) && !hasAnyMatchingSKU)
+            {
+                return (null, null);
+            }
+            else
+            {
+                var totalItemCount = await _context.Storages
+               .Join(
+                   _context.Parts,
+                   storage => storage.PartId,
+                   part => part.PartId,
+                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+               )
+               //.Where(result => result.SKU.Contains(searchQuery))
+               .Distinct()
+               .CountAsync();
+
+                var paginationMetadata = new PaginationMetadata(
+                    totalItemCount, pageSize, pageNumber);
+
+
+                var partsToReturn = await collection
+                  .Include(p => p.Supplier)
+                  .Include(p => p.Storages)
+                         .ThenInclude(s => s.Warehouse)
+                  .OrderBy(c => c.PartName)
+                  .SelectMany(p => p.Storages) // Flatten the Storages collection
+                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                  .Select(group => new PartForAdditionalInfoDto
+                  {
+                      SKU = group.First().Part.SKU,
+                      PartName = group.First().Part.PartName,
+                      SellingPrice = group.First().Part.SellingPrice,
+                      SupplierName = group.First().Part.Supplier.SupplierName,
+                      WarehouseName = group.First().Warehouse.WarehouseName,
+                      TotalQuantity = group.Sum(s => s.Quantity)
+                  })
+                  .Skip(pageSize * (pageNumber - 1))
+                  .Take(pageSize)
+                  .ToListAsync();
+
+                return (partsToReturn, paginationMetadata);
+
             }
 
-            var totalItemCount = await collection.CountAsync();
-
-            var paginationMetadata = new PaginationMetadata(
-                totalItemCount, pageSize, pageNumber);
-
-
-            var partsToReturn = await collection
-              .Include(p => p.Supplier)
-              .Include(p => p.Storages)
-                     .ThenInclude(s => s.Warehouse)
-              .OrderBy(c => c.PartName)
-              .SelectMany(p => p.Storages) // Flatten the Storages collection
-              .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
-
-              // .GroupBy(s => s.WarehouseId)
-              .Select(group => new PartForAdditionalInfoDto
-              {
-                  SKU = group.First().Part.SKU,
-                  PartName = group.First().Part.PartName,
-                  SellingPrice = group.First().Part.SellingPrice,
-                  SupplierName = group.First().Part.Supplier.SupplierName,
-                  WarehouseName = group.First().Warehouse.WarehouseName,
-                  TotalQuantity = group.Sum(s => s.Quantity)
-              })
-              .Skip(pageSize * (pageNumber - 1))
-              .Take(pageSize)
-              .ToListAsync();
-
-
-            //var partsToReturn =  collection
-            //    .Include(a => a.Storages)
-            //        .ThenInclude(a=> a.Warehouse)
-            //.GroupBy(s=> s.)
-            //.Select(p => new PartForAdditionalInfoDto
-            //{
-            //    PartName = p.PartName,
-            //    SupplierName = p.Supplier.SupplierName, // Assuming SupplierName is a property in the Supplier class
-            //    TotalQuantity = _context.Storages
-            //        .Where(s => s.PartId == p.PartId)
-            //        .Sum(s => s.Quantity),
-            //    SellingPrice = p.BuyingPrice,
-            //    WarehouseName = _context.Storages
-            //        .Where(s => s.PartId == p.PartId)
-            //        .Select(s => s.Warehouse.WarehouseName)
-            //        .FirstOrDefault()
-            //})
-            //.ToList();
-
-
-
-            //Use AutoMapper's ProjectTo for efficient projection
-            //var partsToReturn = await collection
-            //   .Include(p => p.Supplier)
-            //   .Include(p => p.Storages)
-            //        .ThenInclude(s => s.Warehouse)
-            //    .OrderBy(c => c.PartName)
-            //    .SelectMany(p => p.Storages) // Flatten the Storages collection
-            //    .GroupBy(s => s.PartId)
-            //    .Skip(pageSize * (pageNumber - 1))
-            //    .Take(pageSize)
-            //    .ProjectTo<PartForAdditionalInfoDto>(_mapper.ConfigurationProvider)  // Assuming you have a PartDto
-            //    .ToListAsync();
-
-            return (partsToReturn, paginationMetadata);
         }
 
         public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber)
         {
             var collection = _context.Parts.AsQueryable();
+            var hasAnyMatchingSKU = await collection
+                 .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+
+
+            if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
             {
                 searchQuery = searchQuery.Trim();
                 var SKUs = collection
@@ -265,56 +289,72 @@ namespace SparePart.ModelAndPersistance.Repository
                     .Where(a => categoryNames.Contains(a.Category.CategoryId)
                     && !a.SKU.Contains(searchQuery)
                     );
+
+
+                var totalItemCount = await collection
+                 .Join(
+                   _context.Storages,
+                   part => part.PartId,
+                   storage => storage.PartId,
+                   (part, storage) => new {  part.PartId, storage.Warehouse.WarehouseName,part.SKU }
+                  )
+               .Where(result => !result.SKU.Contains(searchQuery))
+               .Distinct()
+               .CountAsync();
+
+                var allPartsCount = await _context.Storages
+               .Join(
+                   _context.Parts,
+                   storage => storage.PartId,
+                   part => part.PartId,
+                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+               )
+               .Where(result => result.SKU.Contains(searchQuery))
+               .Distinct()
+               .CountAsync();
+
+                if (totalItemCount == 0)
+                {
+                    return (null, null);
+                }
+
+                var paginationMetadata = new PaginationMetadata(
+                    totalItemCount, pageSize, pageNumber);
+
+                // Use AutoMapper's ProjectTo for efficient projection
+                var partsToReturn = await collection
+                  .Include(p => p.Supplier)
+                  .Include(p => p.Storages)
+                         .ThenInclude(s => s.Warehouse)
+                  .OrderBy(c => c.PartName)
+                  .SelectMany(p => p.Storages) // Flatten the Storages collection
+                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                  .Select(group => new PartForAdditionalInfoDto
+                  {
+                      SKU = group.First().Part.SKU,
+                      PartName = group.First().Part.PartName,
+                      SellingPrice = group.First().Part.SellingPrice,
+                      SupplierName = group.First().Part.Supplier.SupplierName,
+                      WarehouseName = group.First().Warehouse.WarehouseName,
+                      TotalQuantity = group.Sum(s => s.Quantity)
+                  })
+                  .Skip(pageSize * (pageNumber - 1))
+                  .Take(pageSize)
+                  .ToListAsync();
+
+                return (partsToReturn, paginationMetadata);
+
+            }
+            else
+            {
+                return (null, null);
             }
 
-            var totalItemCount = await collection.CountAsync();
 
-            var paginationMetadata = new PaginationMetadata(
-                totalItemCount, pageSize, pageNumber);
 
-            // Use AutoMapper's ProjectTo for efficient projection
-            var partsToReturn = await collection
-                .Include(a => a.Storages)
-                .Include(a => a.Supplier)
-                .OrderBy(c => c.PartName)
-                .Skip(pageSize * (pageNumber - 1))
-                .Take(pageSize)
-                .ProjectTo<PartForAdditionalInfoDto>(_mapper.ConfigurationProvider)  // Assuming you have a PartDto
-                .ToListAsync();
-
-            return (partsToReturn, paginationMetadata);
         }
 
 
-        public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> Testing(string searchQuery, int pageSize, int pageNumber)
-        {
-            var partsWithWarehouses = await _context.Storages
-                .Where(storage => storage.Part.SKU.Contains(searchQuery)) // Filter by SKU
-                .Include(storage => storage.Part)
-                .Include(storage => storage.Warehouse)
-                .OrderBy(storage => storage.Part.PartName)
-                .Skip(pageSize * (pageNumber - 1))
-                .Take(pageSize)
-                .Select(storage => new PartForAdditionalInfoDto
-                {
-                    PartName = storage.Part.PartName,
-                    SKU = storage.Part.SKU,
-                    WarehouseName = storage.Warehouse.WarehouseName,
-                    SellingPrice = storage.Part.SellingPrice,
-                    TotalQuantity = storage.Quantity,
-
-                    // Add other properties as needed
-                })
-                .ToListAsync();
-
-            var totalItemCount = await _context.Storages
-                .Where(storage => storage.Part.SKU.Contains(searchQuery)) // Count based on the filtered SKU
-                .CountAsync();
-
-            var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
-
-            return (partsWithWarehouses, paginationMetadata);
-        }
 
 
 

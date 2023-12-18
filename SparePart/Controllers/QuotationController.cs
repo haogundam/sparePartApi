@@ -14,7 +14,6 @@ namespace SparePart.Controllers
         const int PageSize = 10;
         public QuotationController( IQuotationService quotationService, ICustomerService customerService)
         {
-
             _quotationService = quotationService;
             _customerService = customerService;
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SparePart.ModelAndPersistance.Dtos
+namespace SparePart.ModelAndPersistance.Models
 {
     public class PartForAdditionalInfoDto
     {

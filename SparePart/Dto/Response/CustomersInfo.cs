@@ -14,12 +14,4 @@ namespace SparePart.Dto.Response
 
     }
 
-    //public class CustomerInfoResponse 
-    //{
-    
-    //    public ICollection<CustomersInfo> CustomersInfo { get; set; }
-    //    public int  TotalPageCount { get; set; }
-    
-    //}
-
 }

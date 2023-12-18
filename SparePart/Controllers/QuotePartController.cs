@@ -19,23 +19,20 @@ namespace SparePart.Controllers
         private readonly IQuotationService _quotationService;
         private readonly ICustomerService _customerService;
         private readonly IQuotePartService _quotePartService;
-        private readonly ICustomerRepository _customerRepository;
         private readonly IQuotationRepository _quotationRepository;
         private readonly IQuotationPartRepository _quotationPartRepository;
-        private readonly IMapper _mapper;
+
         const int PageSize = 10;
 
-        public QuotePartController(IQuotationService quotationService,ICustomerService customerService, ICustomerRepository customerRepository, IQuotationRepository quotationRepository,
-            IQuotationPartRepository quotationPartRepository,IQuotePartService quotePartService,IMapper mapper)
+        public QuotePartController(IQuotationService quotationService,ICustomerService customerService, IQuotationRepository quotationRepository,
+            IQuotationPartRepository quotationPartRepository,IQuotePartService quotePartService)
         {
             _quotationService = quotationService;
             _customerService = customerService;
 
-            _customerRepository = customerRepository;
             _quotationRepository = quotationRepository;
             _quotationPartRepository = quotationPartRepository;
             _quotePartService = quotePartService ?? throw new ArgumentNullException(nameof(quotePartService));
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -122,8 +119,6 @@ namespace SparePart.Controllers
             quoteListByQuoteNo.TotalAmount = totalAmount;
             await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
 
-
-
             //await _quotationService.UpdateTotalAmount(quoteListByQuoteNo);
 
             return Ok($"PartID {quotePartAdd.PartId} added to QuoteNo {quoteNo}");
@@ -179,7 +174,6 @@ namespace SparePart.Controllers
 
         }
 
-
         [HttpPatch("submit")]
         public async Task<ActionResult> SubmitQuotationList(int customerId, int quoteNo)
         {
@@ -199,58 +193,6 @@ namespace SparePart.Controllers
 
             return Ok("Submitted!");
         }
-
-
-        //[HttpPost]
-        //public async Task<ActionResult<QuotationPart>> AddQuotationPart([FromQuery]int customerId, int quoteNo,[FromBody]QuotePartAdd quotePartAdd)
-        //{
-        //    if (await _customerService.CheckCustomerExist(customerId) == false)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
-
-        //    if (quoteListByQuoteNo == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    bool quantityCheck, priceCheck;
-
-        //     _mapper.Map<QuotationPart>(quotePartAdd);
-        //    var quotationPart = _mapper.Map<QuotationPart>(quoteNo);
-
-
-        //    (quantityCheck, priceCheck) = await _quotePartService.AddQuotationPartAsync(quotationPart);
-
-        //    if (!quantityCheck && !priceCheck)
-        //    {
-        //        return BadRequest("Quantity exceeds available stock and the selling price is lower than the base price.");
-        //    }
-        //    else if (!quantityCheck)
-        //    {
-        //        return BadRequest("Quantity exceeds available stock.");
-        //    }
-        //    else if (!priceCheck)
-        //    {
-        //        return BadRequest("The selling price is lower than the base price.");
-        //    }
-
-        //    return Ok(quotationPart);
-        //}
-
-        //[HttpDelete]
-        //public async Task<ActionResult> RemoveQuotationPart(int quotePartId) {
-        //    if (!await _quotePartService.CheckQuotePartExists(quotePartId))
-        //    {
-        //        return BadRequest("Part with " + quotePartId + " id was not found.");
-        //    }
-        //    _quotePartService.RemoveQuotationPart(quotePartId);
-        //    return Ok();
-        //}
-
-
 
     }
 }

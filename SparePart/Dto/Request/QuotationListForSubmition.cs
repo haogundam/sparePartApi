@@ -5,9 +5,7 @@ namespace SparePart.Dto.Request
     public class QuotationListForSubmition
     {
         public DateOnly QuoteDate { get; set; }
-
         public DateOnly QuoteValidDate { get; set; }
-
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
         public int UserId { get; set; } = 1;
