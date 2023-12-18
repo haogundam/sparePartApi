@@ -34,7 +34,7 @@ namespace SparePart.ModelAndPersistance.Repository
         Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber);
 
 
-
+        Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> Testing(string searchQuery, int pageSize, int pageNumber);
 
         }
 }

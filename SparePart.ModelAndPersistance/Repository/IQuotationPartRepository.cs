@@ -11,15 +11,13 @@ namespace SparePart.ModelAndPersistance.Repository
 {
     public interface IQuotationPartRepository
     {
-
-        
         Task<bool> QuotationPartExists(int quotationPartId);
 
         Task<QuotationPart> GetQuotationPartById(int quotePartId);
 
         Task<QuotationPart> AddQuotationPart(QuotationPart quotationPart);
 
-        Task<QuotationPart> DeleteQuotationPart(QuotationPart quotationItem);
+         Task<QuotationPart> DeleteQuotationPart(QuotationPart quotationItem);
 
         Task<QuotationPart> UpdateQuotationPart(QuotationPart quotationPart);
 

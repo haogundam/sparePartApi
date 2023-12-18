@@ -14,23 +14,26 @@ namespace SparePart.Controllers
     public class PartController : ControllerBase
     {
         private readonly IPartService _partService;
-        const int PageSize = 1;
-        public PartController(IPartService partService)
+        private readonly IPartRepository _partRepository;
+        const int PageSize = 10;
+        public PartController(IPartService partService, IPartRepository partRepository)
         {
             _partService = partService;
+            _partRepository = partRepository;
         }
 
+        // TODO
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetAllParts(string? sku, int pageNumber)
         {
-            var (parts, paginationMetadata) = await _partService.GetPartsBySKU(sku, PageSize, pageNumber);
+            var (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, PageSize, pageNumber);
             if (parts == null) { return NotFound(); }
 
 
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
                 pageNumber = paginationMetadata.TotalPageCount;
-                (parts, paginationMetadata) = await _partService.GetPartsBySKU(sku, PageSize, pageNumber);
+                (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, PageSize, pageNumber);
             }
 
 

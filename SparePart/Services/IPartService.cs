@@ -8,5 +8,6 @@ namespace SparePart.Services
     {
         Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> GetPartsBySKU(string? sku, int pageSize, int pageNumber);
         Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> GetAllPartsWithSameCategory(string? sku, int pageSize, int pageNumber);
+        Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> Test(string? sku, int pageSize, int pageNumber);
     }
 }

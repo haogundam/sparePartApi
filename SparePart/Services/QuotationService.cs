@@ -110,5 +110,23 @@ namespace SparePart.Services
             await _quotationRepository.UpdateQuotationList(quotationList);
         }
 
+
+        public async Task UpdateTotalAmount(QuotationList quotationList)
+        {
+            double totalAmount = 0;
+                
+            foreach (var part in quotationList.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
+            
+            quotationList.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quotationList);
+        
+        }
+
+
+
     }
 }

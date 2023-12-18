@@ -29,26 +29,6 @@ namespace SparePart.Services
             }
             return (parts, paginationMetadata);
 
-            //var (parts, paginationMetadata) = await _partRepository.SearchPartsBySKU(sku, pageSize, pageNumber);
-            //if (parts == null) { return (null, paginationMetadata); }
-
-            //var skuPartResponses = new List<PartResponse>();
-
-            //foreach (var part in parts)
-            //{
-            //    //var supplierName = await _partRepository.GetSupplierNameByPartId(part.PartId);
-            //    //var warehouseName = await _partRepository.GetWarehouseNameByPartId(part.PartId);
-            //    //var quantityLeft = await _partRepository.GetPartQuantity(part.PartId);
-
-            //    var partResponse = _mapper.Map<PartResponse>(part);
-
-            //    //partResponse.SupplierName = supplierName;
-            //    //partResponse.WarehouseName = warehouseName;
-            //   // partResponse.Quantity = quantityLeft;
-
-            //    skuPartResponses.Add(partResponse);
-            //}
-            // return (skuPartResponses, paginationMetadata);
         }
         public async Task<(IEnumerable<PartForAdditionalInfoDto>?,PaginationMetadata)> GetAllPartsWithSameCategory(string? sku,int pageSize, int pageNumber)
         {
@@ -83,6 +63,20 @@ namespace SparePart.Services
 
             //return (skuPartResponses,paginationMetadata);
         }
+
+
+
+        public async Task<(IEnumerable<PartForAdditionalInfoDto>?, PaginationMetadata)> Test(string? sku, int pageSize, int pageNumber)
+        {
+            var (parts, paginationMetadata) = await _partRepository.Testing(sku, pageSize, pageNumber);
+            if (parts == null)
+            {
+                return (null, paginationMetadata);
+            }
+            return (parts, paginationMetadata);
+        }
+
+
 
     }
 }

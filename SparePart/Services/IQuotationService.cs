@@ -17,5 +17,7 @@ namespace SparePart.Services
 
         Task SubmitQuotationList(QuotationList quotationList);
 
+        Task UpdateTotalAmount(QuotationList quotationList);
+
     }
 }

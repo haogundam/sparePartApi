@@ -57,12 +57,15 @@ namespace SparePart.ModelAndPersistance.Repository
             return quotePart;
         }
 
-        public Task<QuotationPart> DeleteQuotationPart(QuotationPart quotationItem)
+        public async Task<QuotationPart> DeleteQuotationPart(QuotationPart quotationItem)
         {
             _context.Remove(quotationItem);
-            _context.SaveChangesAsync();
-            return Task.FromResult(quotationItem);
+           await _context.SaveChangesAsync();
+            return quotationItem;
         }
+
+   
+
 
         public async Task<bool> QuotationPartExists(int quotationPartId)
         {

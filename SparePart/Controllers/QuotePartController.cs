@@ -61,6 +61,18 @@ namespace SparePart.Controllers
                 (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, pageNumber);
             }
 
+            double totalAmount = 0;
+
+            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
+
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+
+
             Response.Headers.Add("X-Pagination",
                      System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 
@@ -68,9 +80,8 @@ namespace SparePart.Controllers
 
         }
 
-
         [HttpPost]
-        public async Task<ActionResult> AddNewQuotePart([FromQuery] int customerId, int quoteNo, [FromBody] QuotePartAdd quotePartAdd)
+        public async Task<ActionResult> AddNewQuotePart( int customerId, int quoteNo, [FromBody] QuotePartAdd quotePartAdd)
         {
             if (await _customerService.CheckCustomerExist(customerId) == false)
             {
@@ -99,13 +110,28 @@ namespace SparePart.Controllers
                 return BadRequest("The selling price is lower than the base price.");
             }
 
-            return Ok($"PartID {quotePartAdd.PartId} added to QuoteNo {quoteNo}");
+            // edit total amount when add 
+            double totalAmount = 0;
 
+            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
+
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+
+
+
+            //await _quotationService.UpdateTotalAmount(quoteListByQuoteNo);
+
+            return Ok($"PartID {quotePartAdd.PartId} added to QuoteNo {quoteNo}");
 
         }
 
         [HttpDelete("quoteparts/{quotePartId}")]
-        public async Task<ActionResult> RemoveQuotePart([FromQuery] int customerId, int quoteNo, int quotePartId)
+        public async Task<ActionResult> RemoveQuotePart( int customerId, int quoteNo, int quotePartId)
         {
             if (await _customerService.CheckCustomerExist(customerId) == false)
             {
@@ -124,8 +150,32 @@ namespace SparePart.Controllers
                 return NotFound($"No this QuotePartId{quotePartId}");
             }
 
-            _quotePartService.RemoveQuotationPart(quotePartId);
-                return Ok("Successfuly  remove");
+            var exists = await _quotePartService.CheckQuotePartExistsinSpecificQuoteList(quotePartId);
+            if (exists.QuoteNo != quoteNo)
+            {
+                return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
+            }
+
+            var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
+            await _quotationPartRepository.DeleteQuotationPart(quotationPart);
+
+
+            double totalAmount = 0;
+
+            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
+
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+
+
+
+
+            //_quotePartService.RemoveQuotationPart(quotePartId);
+            return Ok($"Successfuly remove QuotepartID {quotePartId} from QuoteList {quoteNo}");
 
         }
 

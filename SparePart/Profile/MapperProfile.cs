@@ -27,17 +27,27 @@ namespace SparePart.Profile
             CreateMap<int, QuotationPart>();
 
 
+            //CreateMap<Part, PartForAdditionalInfoDto>()
+            //    .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.SupplierName))
+            //    .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Storages.Select(s => s.Warehouse.WarehouseName).FirstOrDefault()))
+            //    .ForMember(dest => dest.TotalQuantity, opt => opt.MapFrom(src => src.Storages.Sum(s => s.Quantity)))
+            //    .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.SKU))
+            //    .ForMember(dest => dest.PartName, opt => opt.MapFrom(src => src.PartName))
+            //    .ForMember(dest => dest.SellingPrice, opt => opt.MapFrom(src => src.SellingPrice));
+            //       .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Storages.FirstOrDefault().Warehouse.WarehouseId)); // Add this line
+
+            CreateMap<Storage, PartForAdditionalInfoDto>();
             CreateMap<Part, PartForAdditionalInfoDto>()
             .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.SupplierName))
             .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Storages.Select(s => s.Warehouse.WarehouseName).FirstOrDefault()))
             .ForMember(dest => dest.TotalQuantity, opt => opt.MapFrom(src => src.Storages.Sum(s => s.Quantity)));
 
-        //    CreateMap<Part, PartResponse>()
-        //        .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => src.SellingPrice))
-        //        .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.SupplierName))
-        //        .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Storages.FirstOrDefault().Warehouse.WarehouseName))
-        //        .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Storages.FirstOrDefault().Quantity))
-        //        ;
+            //CreateMap<Part, PartResponse>()
+            //    .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => src.SellingPrice))
+            //    .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.SupplierName))
+            //    .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Storages.FirstOrDefault().Warehouse.WarehouseName))
+            //    .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Storages.FirstOrDefault().Quantity))
+            //    ;
         }
 
     }

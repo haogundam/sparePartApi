@@ -19,9 +19,9 @@ namespace SparePart.Services
 
         public async Task<bool> CheckCustomerExist(int customerId)
         {
-            var exists = await _customerRepository.CustomerExistsAsync(customerId);
+            var exists = await _customerRepository.GetCustomerByCustomerId(customerId);
 
-            if (exists == false) { return false; }
+            if (exists == null) { return false; }
 
             return true;
         }

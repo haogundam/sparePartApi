@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "GET Customers",
+			"name": "// GET Customers",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -113,7 +113,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"CustomerName\" : \"Muthu Malanthi\",\r\n    \"CustomerContact\": \"0125201314\",\r\n    \"CustomerEmail\": \"muthu-m@gmail.com\",\r\n    \"CustomerAddress\" : \"666 GoodDay Street\"\r\n}",
+					"raw": "{\r\n    \"CustomerName\" : \"Joker Saintarus\",\r\n    \"CustomerContact\": \"515220000\",\r\n    \"CustomerEmail\": \"joker_saint@gmail.com\",\r\n    \"CustomerAddress\" : \"321 Jalan Jupiter\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -137,100 +137,6 @@
 			"response": []
 		},
 		{
-			"name": "Update data",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Successful PUT request\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-							"});",
-							""
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{base_url}}/info?id=1",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"info"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
-					]
-				},
-				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
-			},
-			"response": []
-		},
-		{
-			"name": "Delete data",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Successful DELETE request\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
-							"});",
-							""
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{base_url}}/info?id=1",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"info"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
-					]
-				},
-				"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
-			},
-			"response": []
-		},
-		{
 			"name": "POST CreateNewQuoteList",
 			"request": {
 				"method": "POST",
@@ -245,7 +151,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:{{newPort}}/api/customers/5/quotations",
+					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -254,7 +160,7 @@
 					"path": [
 						"api",
 						"customers",
-						"5",
+						"1",
 						"quotations"
 					]
 				}
@@ -267,7 +173,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations?pendingPageNumber=1&paidPageNumber=1",
+					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations?pageNumber=1",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -281,12 +187,102 @@
 					],
 					"query": [
 						{
-							"key": "pendingPageNumber",
+							"key": "pageNumber",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH SubmitQuotelist",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations/2/submit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{newPort}}",
+					"path": [
+						"api",
+						"customers",
+						"1",
+						"quotations",
+						"2",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Parts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{newPort}}/api/parts?pageNumber=1&sku=MR",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{newPort}}",
+					"path": [
+						"api",
+						"parts"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
 							"value": "1"
 						},
 						{
-							"key": "paidPageNumber",
-							"value": "1"
+							"key": "sku",
+							"value": "MR"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Parts sku, category",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{newPort}}/api/parts/category?pageNumber=420&sku=MR22",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{newPort}}",
+					"path": [
+						"api",
+						"parts",
+						"category"
+					],
+					"query": [
+						{
+							"key": "pageNumber",
+							"value": "420"
+						},
+						{
+							"key": "sku",
+							"value": "MR22"
 						}
 					]
 				}
@@ -323,69 +319,13 @@
 			"response": []
 		},
 		{
-			"name": "GET Parts",
+			"name": "POST Add QuotePart",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:{{newPort}}/api/parts?pageNumber=1",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "{{newPort}}",
-					"path": [
-						"api",
-						"parts"
-					],
-					"query": [
-						{
-							"key": "pageNumber",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GET Parts sku, category",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:{{newPort}}/api/parts?pageNumber=1&sku=MR",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "{{newPort}}",
-					"path": [
-						"api",
-						"parts"
-					],
-					"query": [
-						{
-							"key": "pageNumber",
-							"value": "1"
-						},
-						{
-							"key": "sku",
-							"value": "MR"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "PATCH SubmitQuotelist",
-			"request": {
-				"method": "PATCH",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n}",
+					"raw": "{\r\n        \"PartID\": 12,\r\n        \"Quantity\": 1,\r\n        \"UnitPrice\": 1500\r\n\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -393,7 +333,47 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations/5/submit",
+					"raw": "https://localhost:{{newPort}}/api/customers/4/quotations/5",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{newPort}}",
+					"path": [
+						"api",
+						"customers",
+						"4",
+						"quotations",
+						"5"
+					],
+					"query": [
+						{
+							"key": "partId",
+							"value": "5",
+							"disabled": true
+						},
+						{
+							"key": "quantity",
+							"value": "7",
+							"disabled": true
+						},
+						{
+							"key": "unitPrice",
+							"value": "200.50",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "// DELETE Remove QuotePart",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{newPort}}/api/customers/1/quotations/6/quoteparts/2",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -404,8 +384,9 @@
 						"customers",
 						"1",
 						"quotations",
-						"5",
-						"submit"
+						"6",
+						"quoteparts",
+						"2"
 					]
 				}
 			},
