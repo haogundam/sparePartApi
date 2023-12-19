@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto.Request;
@@ -13,6 +14,7 @@ using System.Xml.Linq;
 namespace SparePart.Controllers
 {
     [Route("api/customers/{customerId}/quotations/{quoteNo}")]
+    [Authorize]
     [ApiController]
     public class QuotePartController : ControllerBase
     {

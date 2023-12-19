@@ -302,17 +302,6 @@ namespace SparePart.ModelAndPersistance.Repository
                .Distinct()
                .CountAsync();
 
-                var allPartsCount = await _context.Storages
-               .Join(
-                   _context.Parts,
-                   storage => storage.PartId,
-                   part => part.PartId,
-                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
-               )
-               .Where(result => result.SKU.Contains(searchQuery))
-               .Distinct()
-               .CountAsync();
-
                 if (totalItemCount == 0)
                 {
                     return (null, null);

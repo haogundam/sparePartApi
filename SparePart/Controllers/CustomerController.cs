@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto;
 using SparePart.Dto.Response;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 namespace SparePart.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/customers")]
     public class CustomerController : ControllerBase
     {

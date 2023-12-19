@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto.Response;
@@ -10,6 +11,7 @@ using SparePart.Services;
 namespace SparePart.Controllers
 {
     [Route("api/parts")]
+    [Authorize]
     [ApiController]
     public class PartController : ControllerBase
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto.Response;
 using SparePart.Services;
 using System.Xml.Linq;
@@ -6,6 +7,7 @@ using System.Xml.Linq;
 namespace SparePart.Controllers
 {
     [Route("api/customers/{customerid}/quotations")]
+    [Authorize]
     [ApiController]
     public class QuotationController : ControllerBase
     {
