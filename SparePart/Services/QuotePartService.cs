@@ -49,6 +49,41 @@ namespace SparePart.Services
             return (isQuantityValid: true, isPriceValid: true);
         }
 
+
+        public async Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart)
+        {
+            var part = await _partRepository.GetPartById(quotationPart.PartId);
+            if (part == null)
+            {
+                return (false, false);
+            }
+
+            // Check if the quantity is valid
+            if (quotationPart.Quantity > await _partRepository.GetPartQuantity(part.PartId))
+            {
+                return (isQuantityValid: false, isPriceValid: true);
+            }
+
+            // Check if the unit price is valid
+            if (quotationPart.UnitPrice < part.BuyingPrice)
+            {
+                return (isQuantityValid: true, isPriceValid: false);
+            }
+
+            // Both quantity and price are valid, add the QuotationPart
+            var quotePart = new QuotationPart
+            {
+                QuoteNo = quoteNo,
+                PartId = quotationPart.PartId,
+                Quantity = quotationPart.Quantity,
+                UnitPrice = quotationPart.UnitPrice,
+            };
+
+            await _quotationPartRepository.UpdateQuotationPart(quotePart);
+
+            return (isQuantityValid: true, isPriceValid: true);
+        }
+
         public async Task<bool> CheckQuotePartExists(int quotePartId)
         {
             var exists = await _quotationPartRepository.GetQuotationPartById(quotePartId);

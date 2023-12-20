@@ -144,6 +144,37 @@ namespace SparePart.ModelAndPersistance.Repository
             return (partsToReturn, paginationMetadata);
         }
 
+
+        public async Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetQuoteListByCustomerIdAndStatus(int customerId, int pageSize, int pageNumber, Status status)
+        {
+            var exists = await _context.QuotationLists
+                //.Include(a => a.Customer)
+                .Where(a => a.Customer.CustomerId == customerId && a.Status == status)
+                .AnyAsync();
+
+            if (exists == false) { return (null, null); }
+
+
+            var collection = _context.QuotationLists.AsQueryable();
+                        
+            collection = collection
+                .Include(a => a.Customer)
+                .Where(a => a.Customer.CustomerId == customerId && a.Status == status);
+
+
+            var totalItemCount = await collection.CountAsync();
+
+            var paginationMetadata = new PaginationMetadata(
+                totalItemCount, pageSize, pageNumber);
+
+            var partsToReturn = await collection.OrderBy(c => c.QuoteNo)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (partsToReturn, paginationMetadata);
+        }
+
         public async Task<(IEnumerable<QuotationList>, PaginationMetadata)> SearchQuoteListByCustomerNameAndStatus(string? searchQuery, int pageSize, int pageNumber,Status status)
         {
             var collection = _context.QuotationLists.AsQueryable();

@@ -6,6 +6,8 @@ namespace SparePart.Services
 {
     public interface IQuotePartService
     {
+        Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart);
+
         Task<(bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd);
 
         Task<QuotationPart> CheckQuotePartExistsinSpecificQuoteList(int quotePartId);

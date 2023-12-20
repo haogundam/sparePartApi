@@ -31,48 +31,60 @@ namespace SparePart.Services
             return quoteList;
         }
 
-        public async Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId,int quoteNo,int pageSize, int pageNumber)
+        public async Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageSize, int pageNumber)
         {
             var quoteList = await _quotationRepository.GetQuoteListByQuoteNo(customerId, quoteNo);
             var (quotationPart, partPaginationMetadata) = await _quotationPartRepository.GetAllQuotationPartFromQuoteNo(quoteNo, pageSize, pageNumber);
 
-            var response = new QuotationPartResponse
-            {
-                QuoteNo = quoteList.QuoteNo,
-                QuoteDate = quoteList.QuoteDate.ToString("yyy-MM-dd"),
-                TotalAmount = quoteList.TotalAmount,
-                Parts = _mapper.Map<ICollection<PartsInQuotationList>>(quotationPart),
-            };
+            
+                var response = new QuotationPartResponse
+                {
+                    QuoteNo = quoteList.QuoteNo,
+                    QuoteDate = quoteList.QuoteDate.ToString("yyy-MM-dd"),
+                    TotalAmount = quoteList.TotalAmount,
+                    Parts = _mapper.Map<ICollection<PartsInQuotationList>>(quotationPart),
+                };
 
-            return (response, partPaginationMetadata);
+                return (response, partPaginationMetadata);
+            
         }
 
-        public async Task<(QuotationListResponse?, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId,int pageSize, int pageNumber)
+        public async Task<(QuotationListResponse, PaginationMetadata, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId,int pageSize, int pendingPageNumber, int paidPageNumber)
         {
             var customer = await _customerRepository.GetCustomerByCustomerId(customerId);
             if (customer == null)
             {
-                return (null,null);
+                return (null,null,null);
             }
 
-            var (quotationList, paginationMetadata) = await _quotationRepository.GetQuoteListByCustomerId(customerId, pageSize, pageNumber);
+            var (pendingQuotationList, pendingPaginationMetadata) = await _quotationRepository.GetQuoteListByCustomerIdAndStatus(customerId, pageSize, pendingPageNumber, Status.pending);           
+            var (paidQuotationList, paidPaginationMetadata) = await _quotationRepository.GetQuoteListByCustomerIdAndStatus(customerId, pageSize, paidPageNumber, Status.paid);
+
+
 
             var response = new QuotationListResponse
             {
                 CustomerId = customer.CustomerId,
                 CustomerName = customer.CustomerName,
 
-                QuotationList = quotationList.Select(q => new QuotationResponse
+                PendingQuotationList = pendingQuotationList?.Select(q => new QuotationResponse
                 {
                     QuoteNo = q.QuoteNo,
                     QuoteDate = q.QuoteDate.ToString("yyyy-MM-dd"),
                     QuoteValidDate = q.QuoteValidDate.ToString("yyyy-MM-dd"),
-                    Status = q.Status
                 }).ToList(),
 
+                PaidQuotationList = paidQuotationList?.Select(q => new QuotationResponse
+                {
+                    QuoteNo = q.QuoteNo,
+                    QuoteDate = q.QuoteDate.ToString("yyyy-MM-dd"),
+                    QuoteValidDate = q.QuoteValidDate.ToString("yyyy-MM-dd"),
+                }).ToList(),
             };
 
-            return (response, paginationMetadata);
+            return (response, pendingPaginationMetadata, paidPaginationMetadata);
+
+
 
         }
 

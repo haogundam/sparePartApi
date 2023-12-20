@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SparePart.Dto.Response;
+using SparePart.ModelAndPersistance;
 using SparePart.Services;
 using System.Xml.Linq;
 
@@ -21,28 +22,32 @@ namespace SparePart.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<QuotationListResponse>> GetQuotationListsByCustomerId(int customerId, int pageNumber)
+        public async Task<ActionResult<QuotationListResponse>> GetQuotationListsByCustomerId(int customerId, int pendingPageNumber = 1, int paidPageNumber = 1)
         {
             if (await _customerService.CheckCustomerExist(customerId) == false)
             {
                 return NotFound("No this customer");
             }
 
-            var (quotationList, paginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize,pageNumber);
+            var (quotationList, pendingPaginationMetadata, paidPaginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize, pendingPageNumber, paidPageNumber);
 
-            if (quotationList == null)
+            if (pendingPaginationMetadata != null && pendingPageNumber > pendingPaginationMetadata.TotalPageCount || pendingPageNumber < 1)
             {
-                return NotFound("");
+                pendingPageNumber = pendingPaginationMetadata.TotalPageCount;
+                (quotationList, pendingPaginationMetadata, paidPaginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize, pendingPageNumber, paidPageNumber);
             }
 
-            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
+            if (paidPaginationMetadata != null && paidPageNumber > paidPaginationMetadata.TotalPageCount || paidPageNumber < 1)
             {
-                pageNumber = paginationMetadata.TotalPageCount;
-                (quotationList, paginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize, pageNumber);
+                paidPageNumber = paidPaginationMetadata.TotalPageCount;
+                (quotationList, pendingPaginationMetadata, paidPaginationMetadata) = await _quotationService.GetQuoteListByCustomerIdAndPageData(customerId, PageSize, pendingPageNumber, paidPageNumber);
             }
 
-            Response.Headers.Add("X-Pagination",
-                 System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
+            Response.Headers.Add("Pending-Pagination",
+                 System.Text.Json.JsonSerializer.Serialize(pendingPaginationMetadata));
+
+            Response.Headers.Add("Paid-Pagination",
+                 System.Text.Json.JsonSerializer.Serialize(paidPaginationMetadata));
 
             return Ok(quotationList);
 

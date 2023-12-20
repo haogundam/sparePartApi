@@ -18,8 +18,6 @@ namespace SparePart.ModelAndPersistance.Repository
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetAllQuotationList(int pageSize, int pageNumber);
 
         Task<bool> QuotationListExists(int quoteNo);
-
-
         Task<QuotationList> GetQuoteListByQuoteNo(int customerId,int quoteNo);
         Task<QuotationList> UpdateQuotationList(QuotationList quotationList);
 
@@ -29,6 +27,9 @@ namespace SparePart.ModelAndPersistance.Repository
 
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetQuoteListByCustomerId(int customerId, int pageSize, int pageNumber);
 
+
+        Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetQuoteListByCustomerIdAndStatus(int customerId, int pageSize, int pageNumber, Status status);
+       
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> SearchQuoteListByCustomerNameAndStatus(string? searchQuery, int pageSize, int pageNumber, Status status);
     }
 

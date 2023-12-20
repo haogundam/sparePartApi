@@ -11,7 +11,7 @@ namespace SparePart.Services
 
         Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageSize, int pageNumber);
 
-        Task<(QuotationListResponse?, PaginationMetadata)> GetQuoteListByCustomerIdAndPageData(int customerId, int pageSize, int pageNumber);
+        Task<(QuotationListResponse, PaginationMetadata, PaginationMetadata )> GetQuoteListByCustomerIdAndPageData(int customerId, int pageSize, int pendingPageNumber, int paidPageNumber);
 
         Task<QuotationList?> CreateQuoteListByCustomerId(int customerId);
 

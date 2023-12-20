@@ -54,12 +54,6 @@ namespace SparePart.Controllers
 
             var (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo,PageSize, pageNumber);
 
-            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
-            {
-                pageNumber = paginationMetadata.TotalPageCount;
-                (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, pageNumber);
-            }
-
             double totalAmount = 0;
 
             foreach (var part in quoteListByQuoteNo.QuotationParts)
@@ -71,6 +65,16 @@ namespace SparePart.Controllers
             quoteListByQuoteNo.TotalAmount = totalAmount;
             await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
 
+            if (quotationPart == null || paginationMetadata == null)
+            {
+                return Ok(quotationPart);
+            }
+
+            if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
+            {
+                pageNumber = paginationMetadata.TotalPageCount;
+                (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, pageNumber);
+            }
 
             Response.Headers.Add("X-Pagination",
                      System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
@@ -124,6 +128,69 @@ namespace SparePart.Controllers
             //await _quotationService.UpdateTotalAmount(quoteListByQuoteNo);
 
             return Ok($"PartID {quotePartAdd.PartId} added to QuoteNo {quoteNo}");
+
+        }
+
+        [HttpPatch("quoteparts/{quotePartId}")]
+        public async Task<ActionResult> UpdateQuantotyAndSellingPrice(int customerId, int quoteNo, int quotePartId,[FromBody] QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
+        {
+
+            if (await _customerService.CheckCustomerExist(customerId) == false)
+            {
+                return NotFound("No this customer id");
+            }
+
+            var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
+
+            if (quoteListByQuoteNo == null)
+            {
+                return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
+            }
+
+            if (await _quotePartService.CheckQuotePartExists(quotePartId) == false)
+            {
+                return NotFound($"No this QuotePartId{quotePartId}");
+            }
+
+            var exists = await _quotePartService.CheckQuotePartExistsinSpecificQuoteList(quotePartId);
+            if (exists.QuoteNo != quoteNo)
+            {
+                return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
+            }
+
+            var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
+            quotationPart.Quantity = quotePartUpdatePriceQuantity.Quantity;
+            quotationPart.UnitPrice = quotePartUpdatePriceQuantity.UnitPrice;
+
+            var (quantityCheck, priceCheck) = await _quotePartService.UpdateQuotationPartAsync(quoteNo, quotationPart);
+
+            if (!quantityCheck && !priceCheck)
+            {
+                return BadRequest("Quantity exceeds available stock and the selling price is lower than the base price.");
+            }
+            else if (!quantityCheck)
+            {
+                return BadRequest("Quantity exceeds available stock.");
+            }
+            else if (!priceCheck)
+            {
+                return BadRequest("The selling price is lower than the base price.");
+            }
+
+            // edit total amount when add 
+            double totalAmount = 0;
+
+            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
+
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+
+            return Ok($"PartID {quotationPart.PartId} - New Quantity : {quotationPart.Quantity } " +
+                                                   $"- New UnitPrice    : {quotationPart.UnitPrice } ");
 
         }
 
