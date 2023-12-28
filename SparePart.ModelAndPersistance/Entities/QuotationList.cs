@@ -16,7 +16,6 @@ namespace SparePart.ModelAndPersistance.Entities
         [ForeignKey("CustomerId")]
         public Customer? Customer { get; set; }
         public int CustomerId { get; set; }
-        public string CustomerName { get; set; }
 
         [ForeignKey("UserId")]
         public User? User { get; set; }

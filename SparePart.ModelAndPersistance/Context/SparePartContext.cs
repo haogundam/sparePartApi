@@ -160,7 +160,6 @@ namespace SparePart.ModelAndPersistance.Context
                     QuoteDate = new DateOnly(2023, 02, 01),
                     QuoteValidDate = new DateOnly(2023, 02, 15),
                     CustomerId = 1,
-                    CustomerName = "John Doe",
                     UserId = 1,
                     TotalAmount = 150.00,
                     PaymentType = "Credit",

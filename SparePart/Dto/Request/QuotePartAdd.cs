@@ -3,6 +3,7 @@
     public class QuotePartAdd
     {
         public int PartId { get; set; }
+        public string WarehouseName { get; set; }
         public double UnitPrice { get; set; }
         public int Quantity { get; set; }
 

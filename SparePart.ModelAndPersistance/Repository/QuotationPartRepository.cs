@@ -63,7 +63,7 @@ namespace SparePart.ModelAndPersistance.Repository
         public async Task<(IEnumerable<QuotationPart>, PaginationMetadata)> GetAllQuotationPartFromQuoteNo(int quoteNo, int pageSize, int pageNumber)
         {
             var exists = await _context.QuotationParts.Where(c => c.QuoteNo == quoteNo).AnyAsync();
-            if (exists == false) { return (null, null); }
+            if (exists == false) { return (null, new PaginationMetadata(0,1,0)); }
 
             var collection = _context.QuotationParts.Where(c => c.QuoteNo == quoteNo).AsQueryable();
             var totalItemCount = await collection.CountAsync();

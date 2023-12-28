@@ -36,6 +36,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IQuotationRepository, QuotationRepository>();
 builder.Services.AddScoped<IPartRepository, PartRepository>();
 builder.Services.AddScoped<IQuotationPartRepository, QuotationPartRepository>();
+builder.Services.AddScoped<IStorageRepository, StorageRepository>();
 
 builder.Services.AddScoped<IQuotePartService, QuotePartService>();
 builder.Services.AddScoped<IQuotationService, QuotationService>();
@@ -103,11 +104,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
  
 app.UseRouting();
+app.UseCors("AllowAngularApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseCors("AllowAngularApp");
 
 app.MapControllerRoute(
     name: "default",

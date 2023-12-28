@@ -8,7 +8,7 @@ namespace SparePart.Services
     {
         Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart);
 
-        Task<(bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd);
+        Task<(QuotationPart, bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd);
 
         Task<QuotationPart> CheckQuotePartExistsinSpecificQuoteList(int quotePartId);
 

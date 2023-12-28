@@ -36,15 +36,29 @@ namespace SparePart.ModelAndPersistance.Repository
         }
 
 
-
-        public async Task<int> GetPartQuantity(int partId)
+        // TO DO
+        public async Task<int> GetPartQuantity(int partId,string warehouseName)
         {
-            var totalQuantity = await _context.Storages
-                .Where(s => s.PartId == partId)
-                .SumAsync(s => s.Quantity);
+            var parts = await _context.Parts
+                .Include(p => p.Storages)
+                .ThenInclude(s => s.Warehouse)
+                .Where(p => p.PartId == partId)  // Filter by PartId
+                .SelectMany(p => p.Storages) // Flatten the Storages collection
+                .Where(s => s.Warehouse.WarehouseName == warehouseName)
+                .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                 .Select(group => new
+                 {
+                     TotalQuantity = group.Sum(s => s.Quantity)
+                 })
+                 .FirstOrDefaultAsync();
+
+
+            int totalQuantity = parts.TotalQuantity;
 
             return totalQuantity;
         }
+
+
 
         public async Task<string> GetSupplierNameByPartId(int partId)
         {
@@ -208,6 +222,7 @@ namespace SparePart.ModelAndPersistance.Repository
                   .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
                   .Select(group => new PartForAdditionalInfoDto
                   {
+                      PartId = group.First().Part.PartId,
                       SKU = group.First().Part.SKU,
                       PartName = group.First().Part.PartName,
                       SellingPrice = group.First().Part.SellingPrice,
@@ -251,6 +266,7 @@ namespace SparePart.ModelAndPersistance.Repository
                   .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
                   .Select(group => new PartForAdditionalInfoDto
                   {
+                      PartId = group.First().Part.PartId,
                       SKU = group.First().Part.SKU,
                       PartName = group.First().Part.PartName,
                       SellingPrice = group.First().Part.SellingPrice,
@@ -274,8 +290,6 @@ namespace SparePart.ModelAndPersistance.Repository
             var hasAnyMatchingSKU = await collection
                  .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-
-
             if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
             {
                 searchQuery = searchQuery.Trim();
@@ -296,7 +310,7 @@ namespace SparePart.ModelAndPersistance.Repository
                    _context.Storages,
                    part => part.PartId,
                    storage => storage.PartId,
-                   (part, storage) => new {  part.PartId, storage.Warehouse.WarehouseName,part.SKU }
+                   (part, storage) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU }
                   )
                .Where(result => !result.SKU.Contains(searchQuery))
                .Distinct()
@@ -320,6 +334,7 @@ namespace SparePart.ModelAndPersistance.Repository
                   .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
                   .Select(group => new PartForAdditionalInfoDto
                   {
+                      PartId = group.First().Part.PartId,
                       SKU = group.First().Part.SKU,
                       PartName = group.First().Part.PartName,
                       SellingPrice = group.First().Part.SellingPrice,

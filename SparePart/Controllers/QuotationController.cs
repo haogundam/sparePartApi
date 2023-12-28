@@ -57,13 +57,14 @@ namespace SparePart.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateNewQuotationList(int customerId)
         {
+            var newQuoteList = await _quotationService.CreateQuoteListByCustomerId(customerId);
 
-            if (await _quotationService.CreateQuoteListByCustomerId(customerId) == null)
+            if (newQuoteList == null)
             {
                 return NotFound("No this customer Id");
             }
 
-            return Ok("New QuoteList Created!");
+            return Ok(newQuoteList.QuoteNo);
 
         }
 

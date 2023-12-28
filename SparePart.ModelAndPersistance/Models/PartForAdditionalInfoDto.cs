@@ -8,6 +8,7 @@ namespace SparePart.ModelAndPersistance.Models
 {
     public class PartForAdditionalInfoDto
     {
+        public int PartId { get; set; }
         public string SKU { get; set; }
         public string PartName { get; set; }
         public double SellingPrice { get; set; }

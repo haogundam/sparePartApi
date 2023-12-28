@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SparePart.Dto.Request;
 using SparePart.ModelAndPersistance.Entities;
 using SparePart.ModelAndPersistance.Models;
@@ -20,20 +21,22 @@ namespace SparePart.Services
             _mapper = mapper;
         }
 
-        public async Task<(bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd)
+
+
+        public async Task<(QuotationPart,bool isQuantityValid, bool isPriceValid)> AddQuotationPartAsync(int quoteNo, QuotePartAdd quotePartAdd)
         {
             var part = await _partRepository.GetPartById(quotePartAdd.PartId);
 
             // Check if the quantity is valid
-            if (quotePartAdd.Quantity > await _partRepository.GetPartQuantity(part.PartId))
+            if (quotePartAdd.Quantity > await _partRepository.GetPartQuantity(part.PartId,quotePartAdd.WarehouseName))
             {
-                return (isQuantityValid: false, isPriceValid: true);
+                return (null,isQuantityValid: false, isPriceValid: true);
             }
 
             // Check if the unit price is valid
             if (quotePartAdd.UnitPrice < part.BuyingPrice)
             {
-                return (isQuantityValid: true, isPriceValid: false);
+                return (null,isQuantityValid: true, isPriceValid: false);
             }
 
             // Both quantity and price are valid, add the QuotationPart
@@ -45,10 +48,9 @@ namespace SparePart.Services
                 UnitPrice = quotePartAdd.UnitPrice,
             };
 
-            await _quotationPartRepository.AddQuotationPart(quotePart);
-            return (isQuantityValid: true, isPriceValid: true);
+           var newQuotePart =  await _quotationPartRepository.AddQuotationPart(quotePart);
+            return (newQuotePart,isQuantityValid: true, isPriceValid: true);
         }
-
 
         public async Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart)
         {
@@ -58,11 +60,11 @@ namespace SparePart.Services
                 return (false, false);
             }
 
-            // Check if the quantity is valid
-            if (quotationPart.Quantity > await _partRepository.GetPartQuantity(part.PartId))
-            {
-                return (isQuantityValid: false, isPriceValid: true);
-            }
+            ////Check if the quantity is valid
+            //if (quotationPart.Quantity > await _partRepository.GetPartQuantity(part.PartId))
+            //{
+            //    return (isQuantityValid: false, isPriceValid: true);
+            //}
 
             // Check if the unit price is valid
             if (quotationPart.UnitPrice < part.BuyingPrice)

@@ -37,7 +37,7 @@ namespace SparePart.Controllers
                 (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, PageSize, pageNumber);
             }
 
-
+            
             Response.Headers.Add("X-Pagination",
                 System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 

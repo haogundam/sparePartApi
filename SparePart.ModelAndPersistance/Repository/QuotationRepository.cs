@@ -183,7 +183,7 @@ namespace SparePart.ModelAndPersistance.Repository
             {
                 searchQuery = searchQuery.Trim();
                 collection = collection
-                    .Where(a => a.Status == status && a.CustomerName.Contains(searchQuery));
+                    .Where(a => a.Status == status && a.Customer.CustomerName.Contains(searchQuery));
             }
 
             var totalItemCount = await collection.CountAsync();

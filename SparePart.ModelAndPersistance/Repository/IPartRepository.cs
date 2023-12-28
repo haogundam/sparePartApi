@@ -11,14 +11,13 @@ namespace SparePart.ModelAndPersistance.Repository
     public interface IPartRepository
     {
         Task<Part> GetPartById(int partId);
-
-
-
         Task<(IEnumerable<Part>, PaginationMetadata)> GetAllParts(int pageSize, int pageNumber);
 
         Task<(IEnumerable<Part>, PaginationMetadata)> SearchPartsByCategory(string? searchQuery, int pageSize, int pageNumber);
 
-        Task<int> GetPartQuantity(int partId);
+
+
+        Task<int> GetPartQuantity(int partId,string warehouseName);
 
         Task<string> GetSupplierNameByPartId(int partId);
 
