@@ -43,21 +43,7 @@ namespace SparePart.Controllers
             _storageRepository = storageRepository;
         }
 
-        // TESTING
-        [HttpGet("testing")]
-        public async Task<ActionResult<int>> Quantity(int partId) 
-        {
-            int quantity = await _partRepository.GetPartQuantityInAllStorages(partId);
-            return Ok(quantity);
-        }
-
-        [HttpGet("test")]
-        public async Task<ActionResult<int>> CurrentQuantity(int partId)
-        {
-            int quantity = await _partRepository.GetPartQuantityInAllStorages(partId);
-            return Ok(quantity);
-        }
-        // TTESTING
+      
 
 
         [HttpGet]
@@ -174,7 +160,7 @@ namespace SparePart.Controllers
 
         }
 
-        //// TODO edit price and quantity generate one more new quotepartID
+        //// TODO total amount not up to date
         [HttpPatch("quoteparts/{quotePartId}")]
         public async Task<ActionResult> UpdateQuantityAndSellingPrice(int customerId, int quoteNo, int quotePartId, [FromBody] QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
         {
@@ -249,7 +235,6 @@ namespace SparePart.Controllers
 
             return Ok($"PartID {quotationPart.PartId} - New Quantity : {quotationPart.Quantity} " +
                                                    $"- New UnitPrice    : {quotationPart.UnitPrice} ");
-
         }
 
         [HttpDelete("quoteparts/{quotePartId}")]

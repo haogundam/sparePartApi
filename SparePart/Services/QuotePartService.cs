@@ -61,9 +61,12 @@ namespace SparePart.Services
             }
 
             ////Check if the quantity is valid
-            if (quotePartUpdatePriceQuantity.Quantity > await _partRepository.GetPartQuantityInAllStorages(part.PartId))
+            if (quotePartUpdatePriceQuantity.Quantity > quotationPart.Quantity)
             {
-                return (isQuantityValid: false, isPriceValid: true);
+                if (quotePartUpdatePriceQuantity.Quantity > await _partRepository.GetPartQuantityInAllStorages(part.PartId))
+                {
+                    return (isQuantityValid: false, isPriceValid: true);
+                }
             }
 
             // Check if the unit price is valid
