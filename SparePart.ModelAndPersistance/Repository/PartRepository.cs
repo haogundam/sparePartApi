@@ -338,83 +338,143 @@ namespace SparePart.ModelAndPersistance.Repository
 
         }
 
+        //public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber)
+        //{
+        //    var collection = _context.Parts.AsQueryable();
+        //    var hasAnyMatchingSKU = await collection
+        //         .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+        //    if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
+        //    {
+        //        searchQuery = searchQuery.Trim();
+        //        var SKUs = collection
+        //            .Include(a => a.Category)
+        //            .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+        //        var categoryNames = SKUs.Select(a => a.Category.CategoryId).Distinct();
+        //        collection = collection
+        //            .Include(a => a.Category)
+        //            .Where(a => categoryNames.Contains(a.Category.CategoryId)
+        //            && !a.SKU.Contains(searchQuery)
+        //            );
 
 
+        //        var totalItemCount = await collection
+        //         .Join(
+        //           _context.Storages,
+        //           part => part.PartId,
+        //           storage => storage.PartId,
+        //           (part, storage) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU }
+        //          )
+        //       .Where(result => !result.SKU.Contains(searchQuery))
+        //       .Distinct()
+        //       .CountAsync();
+
+        //        if (totalItemCount == 0)
+        //        {
+        //            return (null, null);
+        //        }
+
+        //        var paginationMetadata = new PaginationMetadata(
+        //            totalItemCount, pageSize, pageNumber);
+
+        //        // Use AutoMapper's ProjectTo for efficient projection
+        //        var partsToReturn = await collection
+        //          .Include(p => p.Supplier)
+        //          .Include(p => p.Storages)
+        //                 .ThenInclude(s => s.Warehouse)
+        //          .OrderBy(c => c.PartName)
+        //          .SelectMany(p => p.Storages) // Flatten the Storages collection
+        //          .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+        //          .Select(group => new PartForAdditionalInfoDto
+        //          {
+        //              PartId = group.First().Part.PartId,
+        //              SKU = group.First().Part.SKU,
+        //              PartName = group.First().Part.PartName,
+        //              SellingPrice = group.First().Part.SellingPrice,
+        //              SupplierName = group.First().Part.Supplier.SupplierName,
+        //              WarehouseName = group.First().Warehouse.WarehouseName,
+        //              TotalQuantity = group.Sum(s => s.Quantity)
+        //          })
+        //          .Skip(pageSize * (pageNumber - 1))
+        //          .Take(pageSize)
+        //          .ToListAsync();
+
+        //        return (partsToReturn, paginationMetadata);
+
+        //    }
+        //    else
+        //    {
+        //        return (null, null);
+        //    }
+
+
+
+        //}
 
         public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber)
         {
             var collection = _context.Parts.AsQueryable();
-            var hasAnyMatchingSKU = await collection
-                 .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-            if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
                 searchQuery = searchQuery.Trim();
-                var SKUs = collection
+                var matchingSKUs = collection
                     .Include(a => a.Category)
                     .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-                var categoryNames = SKUs.Select(a => a.Category.CategoryId).Distinct();
+                var categoryIds = matchingSKUs.Select(a => a.Category.CategoryId).Distinct();
                 collection = collection
                     .Include(a => a.Category)
-                    .Where(a => categoryNames.Contains(a.Category.CategoryId)
-                    && !a.SKU.Contains(searchQuery)
-                    );
+                    .Where(a => categoryIds.Contains(a.Category.CategoryId) && !a.SKU.Contains(searchQuery));
 
-
-                var totalItemCount = await collection
-                 .Join(
-                   _context.Storages,
-                   part => part.PartId,
-                   storage => storage.PartId,
-                   (part, storage) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU }
-                  )
-               .Where(result => !result.SKU.Contains(searchQuery))
-               .Distinct()
-               .CountAsync();
+                var totalItemCount = await _context.Storages
+                    .Join(
+                        collection,
+                        storage => storage.PartId,
+                        part => part.PartId,
+                        (storage, part) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU }
+                    )
+                    .Where(result => !result.SKU.Contains(searchQuery))
+                    .Distinct()
+                    .CountAsync();
 
                 if (totalItemCount == 0)
                 {
                     return (null, null);
                 }
 
-                var paginationMetadata = new PaginationMetadata(
-                    totalItemCount, pageSize, pageNumber);
+                var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
 
                 // Use AutoMapper's ProjectTo for efficient projection
                 var partsToReturn = await collection
-                  .Include(p => p.Supplier)
-                  .Include(p => p.Storages)
-                         .ThenInclude(s => s.Warehouse)
-                  .OrderBy(c => c.PartName)
-                  .SelectMany(p => p.Storages) // Flatten the Storages collection
-                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
-                  .Select(group => new PartForAdditionalInfoDto
-                  {
-                      PartId = group.First().Part.PartId,
-                      SKU = group.First().Part.SKU,
-                      PartName = group.First().Part.PartName,
-                      SellingPrice = group.First().Part.SellingPrice,
-                      SupplierName = group.First().Part.Supplier.SupplierName,
-                      WarehouseName = group.First().Warehouse.WarehouseName,
-                      TotalQuantity = group.Sum(s => s.Quantity)
-                  })
-                  .Skip(pageSize * (pageNumber - 1))
-                  .Take(pageSize)
-                  .ToListAsync();
+                    .Include(p => p.Supplier)
+                    .Include(p => p.Storages)
+                    .ThenInclude(s => s.Warehouse)
+                    .OrderBy(c => c.PartName)
+                    .SelectMany(p => p.Storages)
+                    .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                    .Select(group => new PartForAdditionalInfoDto
+                    {
+                        PartId = group.First().Part.PartId,
+                        SKU = group.First().Part.SKU,
+                        PartName = group.First().Part.PartName,
+                        SellingPrice = group.First().Part.SellingPrice,
+                        SupplierName = group.First().Part.Supplier.SupplierName,
+                        WarehouseName = group.First().Warehouse.WarehouseName,
+                        TotalQuantity = group.Sum(s => s.Quantity)
+                    })
+                    .Skip(pageSize * (pageNumber - 1))
+                    .Take(pageSize)
+                    .ToListAsync();
 
                 return (partsToReturn, paginationMetadata);
-
             }
             else
             {
                 return (null, null);
             }
-
-
-
         }
-
 
 
 

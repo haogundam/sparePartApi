@@ -17,7 +17,7 @@ namespace SparePart.Controllers
     {
         private readonly IPartService _partService;
         private readonly IPartRepository _partRepository;
-        const int PageSize = 10;
+        //const int PageSize = 10;
         public PartController(IPartService partService, IPartRepository partRepository)
         {
             _partService = partService;
@@ -27,14 +27,14 @@ namespace SparePart.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetAllParts(string? sku, int pageNumber)
         {
-            var (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, PageSize, pageNumber);
+            var (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, 4, pageNumber);
             if (parts == null) { return NotFound(); }
 
 
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
                 pageNumber = paginationMetadata.TotalPageCount;
-                (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, PageSize, pageNumber);
+                (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, 4, pageNumber);
             }
 
             
@@ -48,13 +48,13 @@ namespace SparePart.Controllers
         [HttpGet("category")]
         public async Task<ActionResult<IEnumerable<PartResponse>>> GetSameCategoryParts(string? sku, int pageNumber)
         {
-            var (parts, paginationMetadata) = await _partService.GetAllPartsWithSameCategory(sku, PageSize, pageNumber);
+            var (parts, paginationMetadata) = await _partService.GetAllPartsWithSameCategory(sku, 6, pageNumber);
             if (parts == null) { return NoContent(); }
 
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
                 pageNumber = paginationMetadata.TotalPageCount;
-                (parts, paginationMetadata) = await _partService.GetAllPartsWithSameCategory(sku, PageSize, pageNumber);
+                (parts, paginationMetadata) = await _partService.GetAllPartsWithSameCategory(sku, 6, pageNumber);
             }
 
             if (parts == null) { return NoContent(); }
