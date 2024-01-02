@@ -34,7 +34,9 @@ namespace SparePart.Profile
 
 
             CreateMap<QuotationPart, PartsInQuotationList>()
-                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.Part.SKU));
+                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.Part.SKU))
+                .ForMember(dest => dest.PartName, opt => opt.MapFrom(src => src.Part.PartName))
+                ;
 
 
             //CreateMap<Part, PartResponse>()

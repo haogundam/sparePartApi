@@ -160,78 +160,78 @@ namespace SparePart.Controllers
         }
 
         //// TODO edit price and quantity generate one more new quotepartID
-        //[HttpPatch("quoteparts/{quotePartId}")]
-        //public async Task<ActionResult> UpdateQuantityAndSellingPrice(int customerId, int quoteNo, int quotePartId,[FromBody] QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
-        //{
+        [HttpPatch("quoteparts/{quotePartId}")]
+        public async Task<ActionResult> UpdateQuantityAndSellingPrice(int customerId, int quoteNo, int quotePartId, [FromBody] QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
+        {
 
-        //    if (await _customerService.CheckCustomerExist(customerId) == false)
-        //    {
-        //        return NotFound("No this customer id");
-        //    }
+            if (await _customerService.CheckCustomerExist(customerId) == false)
+            {
+                return NotFound("No this customer id");
+            }
 
-        //    var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
+            var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
 
-        //    if (quoteListByQuoteNo == null)
-        //    {
-        //        return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
-        //    }
+            if (quoteListByQuoteNo == null)
+            {
+                return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
+            }
 
-        //    if (await _quotePartService.CheckQuotePartExists(quotePartId) == false)
-        //    {
-        //        return NotFound($"No this QuotePartId{quotePartId}");
-        //    }
+            if (await _quotePartService.CheckQuotePartExists(quotePartId) == false)
+            {
+                return NotFound($"No this QuotePartId{quotePartId}");
+            }
 
-        //    var exists = await _quotePartService.CheckQuotePartExistsinSpecificQuoteList(quotePartId);
-        //    if (exists.QuoteNo != quoteNo)
-        //    {
-        //        return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
-        //    }
+            var exists = await _quotePartService.CheckQuotePartExistsinSpecificQuoteList(quotePartId);
+            if (exists.QuoteNo != quoteNo)
+            {
+                return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
+            }
 
 
-        //    if (quotePartUpdatePriceQuantity.Quantity <= 0)
-        //    {
-        //        return BadRequest("Quantity cannot be 0");
-        //    }
+            if (quotePartUpdatePriceQuantity.Quantity <= 0)
+            {
+                return BadRequest("Quantity cannot be 0");
+            }
 
-        //    var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
-        //    quotationPart.Quantity = quotePartUpdatePriceQuantity.Quantity;
-        //    quotationPart.UnitPrice = quotePartUpdatePriceQuantity.UnitPrice;
+            var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
+            quotationPart.Quantity = quotePartUpdatePriceQuantity.Quantity;
+            quotationPart.UnitPrice = quotePartUpdatePriceQuantity.UnitPrice;
 
-        //    var (quantityCheck, priceCheck) = await _quotePartService.UpdateQuotationPartAsync(quoteNo, quotationPart);
+            var (quantityCheck, priceCheck) = await _quotePartService.UpdateQuotationPartAsync(quoteNo, quotationPart);
 
-        //    if (!quantityCheck && !priceCheck)
-        //    {
-        //        return BadRequest("Quantity exceeds available stock and the selling price is lower than the base price.");
-        //    }
-        //    else if (!quantityCheck)
-        //    {
-        //        return BadRequest("Quantity exceeds available stock.");
-        //    }
-        //    else if (!priceCheck)
-        //    {
-        //        return BadRequest("The selling price is lower than the base price.");
-        //    }
+            if (!quantityCheck && !priceCheck)
+            {
+                return BadRequest("Quantity exceeds available stock and the selling price is lower than the base price.");
+            }
+            else if (!quantityCheck)
+            {
+                return BadRequest("Quantity exceeds available stock.");
+            }
+            else if (!priceCheck)
+            {
+                return BadRequest("The selling price is lower than the base price.");
+            }
 
-        //    // edit total amount when add 
-        //    double totalAmount = 0;
+            // edit total amount when add 
+            double totalAmount = 0;
 
-        //    foreach (var part in quoteListByQuoteNo.QuotationParts)
-        //    {
-        //        double amount = part.UnitPrice * part.Quantity;
-        //        totalAmount += amount;
-        //    }
+            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            {
+                double amount = part.UnitPrice * part.Quantity;
+                totalAmount += amount;
+            }
 
-        //    quoteListByQuoteNo.TotalAmount = totalAmount;
-        //    await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
 
-        //    // update storage quantity
-        //    var updateQuotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
-        //    await _storageRepository.DecreaseStorageQuantity(updateQuotationPart, quotePartUpdatePriceQuantity.Quantity);
+            // update storage quantity
+            var updateQuotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
+            await _storageRepository.DecreaseStorageQuantity(updateQuotationPart, quotePartUpdatePriceQuantity.Quantity);
 
-        //    return Ok($"PartID {quotationPart.PartId} - New Quantity : {quotationPart.Quantity } " +
-        //                                           $"- New UnitPrice    : {quotationPart.UnitPrice } ");
+            return Ok($"PartID {quotationPart.PartId} - New Quantity : {quotationPart.Quantity} " +
+                                                   $"- New UnitPrice    : {quotationPart.UnitPrice} ");
 
-        //}
+        }
 
         [HttpDelete("quoteparts/{quotePartId}")]
         public async Task<ActionResult> RemoveQuotePart( int customerId, int quoteNo, int quotePartId)
