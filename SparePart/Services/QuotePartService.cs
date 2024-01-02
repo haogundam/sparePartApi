@@ -63,7 +63,7 @@ namespace SparePart.Services
             ////Check if the quantity is valid
             if (quotePartUpdatePriceQuantity.Quantity > quotationPart.Quantity)
             {
-                if (quotePartUpdatePriceQuantity.Quantity > await _partRepository.GetPartQuantityInAllStorages(part.PartId))
+                if ((quotePartUpdatePriceQuantity.Quantity - quotationPart.Quantity) > await _partRepository.GetPartQuantityInAllStorages(part.PartId))
                 {
                     return (isQuantityValid: false, isPriceValid: true);
                 }
