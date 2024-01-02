@@ -26,7 +26,7 @@ namespace SparePart.Controllers
         private readonly IQuotationRepository _quotationRepository;
         private readonly IQuotationPartRepository _quotationPartRepository;
 
-        const int PageSize = 1;
+        const int PageSize = 10;
 
         public QuotePartController(IQuotationService quotationService,ICustomerService customerService, IQuotationRepository quotationRepository,
             IQuotationPartRepository quotationPartRepository,IQuotePartService quotePartService,
@@ -43,30 +43,7 @@ namespace SparePart.Controllers
             _storageRepository = storageRepository;
         }
 
-        // TESTING
-        [HttpGet("testing")]
-        public async Task<ActionResult> GetQuantity(int partId, string warehouseName)
-        {
-           var quantity = await _partRepository.GetPartQuantity(partId,warehouseName);
-            
-            return Ok(quantity);
-        }
-
-        [HttpGet("quoteparts/{quotePartId}/testing")]
-        public async Task<ActionResult> UpdateQuantity(int quotePartId, int qty)
-        {
-            if (qty <= 0)
-            {
-                return BadRequest("QTY Cannot 0");
-            }
-
-            var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
-            await _storageRepository.DecreaseStorageQuantity(quotationPart,qty);
-
-            return Ok("Done done done done done");
-        }
-
-        // TESTING
+        
 
         [HttpGet]
         public async Task<ActionResult<QuotationPartResponse>> GetAllPartsInQuoationListById(int customerId, int quoteNo, int pageNumber)
@@ -87,10 +64,15 @@ namespace SparePart.Controllers
 
             double totalAmount = 0;
 
-            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            for (int currentPage = 1; currentPage <= paginationMetadata.TotalPageCount; currentPage++)
             {
-                double amount = part.UnitPrice * part.Quantity;
-                totalAmount += amount;
+                var (getQuotationPart, _) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, currentPage);
+
+                foreach (var part in getQuotationPart.Parts)
+                {
+                    double amount = part.UnitPrice * part.Quantity;
+                    totalAmount += amount;
+                }
             }
 
             quoteListByQuoteNo.TotalAmount = totalAmount;
@@ -320,9 +302,6 @@ namespace SparePart.Controllers
             return Ok("Submitted!");
         }
 
-
-
-        
         [HttpDelete("clear")]
         public async Task<ActionResult<QuotationList>> ClearQuotationPart(int customerId, int quoteNo)
         {

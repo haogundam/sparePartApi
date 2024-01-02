@@ -186,103 +186,160 @@ namespace SparePart.ModelAndPersistance.Repository
 
 
         // NEW
+        //public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchAllPartsBySKU(string searchQuery, int pageSize, int pageNumber)
+        //{
+        //    var collection = _context.Parts.AsQueryable();
+        //    var hasAnyMatchingSKU = await collection
+        //         .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+        //    if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
+        //    {
+        //        searchQuery = searchQuery.Trim();
+        //        collection = collection
+        //            .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+
+        //        var totalItemCount = await _context.Storages
+        //       .Join(
+        //           _context.Parts,
+        //           storage => storage.PartId,
+        //           part => part.PartId,
+        //           (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+        //       )
+        //       .Where(result => result.SKU.Contains(searchQuery))
+        //       .Distinct()
+        //       .CountAsync();
+
+        //        var paginationMetadata = new PaginationMetadata(
+        //            totalItemCount, pageSize, pageNumber);
+
+
+        //        var partsToReturn = await collection
+        //          .Include(p => p.Supplier)
+        //          .Include(p => p.Storages)
+        //                 .ThenInclude(s => s.Warehouse)
+        //          .OrderBy(c => c.PartName)
+        //          .SelectMany(p => p.Storages) // Flatten the Storages collection
+        //          .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+        //          .Select(group => new PartForAdditionalInfoDto
+        //          {
+        //              PartId = group.First().Part.PartId,
+        //              SKU = group.First().Part.SKU,
+        //              PartName = group.First().Part.PartName,
+        //              SellingPrice = group.First().Part.SellingPrice,
+        //              SupplierName = group.First().Part.Supplier.SupplierName,
+        //              WarehouseName = group.First().Warehouse.WarehouseName,
+        //              TotalQuantity = group.Sum(s => s.Quantity)
+        //          })
+        //          .Skip(pageSize * (pageNumber - 1))
+        //          .Take(pageSize)
+        //          .ToListAsync();
+
+        //        return (partsToReturn, paginationMetadata);
+        //    }
+        //    else if (!string.IsNullOrWhiteSpace(searchQuery) && !hasAnyMatchingSKU)
+        //    {
+        //        return (null, null);
+        //    }
+        //    else
+        //    {
+        //        var totalItemCount = await _context.Storages
+        //       .Join(
+        //           _context.Parts,
+        //           storage => storage.PartId,
+        //           part => part.PartId,
+        //           (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+        //       )
+        //       //.Where(result => result.SKU.Contains(searchQuery))
+        //       .Distinct()
+        //       .CountAsync();
+
+        //        var paginationMetadata = new PaginationMetadata(
+        //            totalItemCount, pageSize, pageNumber);
+
+
+        //        var partsToReturn = await collection
+        //          .Include(p => p.Supplier)
+        //          .Include(p => p.Storages)
+        //                 .ThenInclude(s => s.Warehouse)
+        //          .OrderBy(c => c.PartName)
+        //          .SelectMany(p => p.Storages) // Flatten the Storages collection
+        //          .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+        //          .Select(group => new PartForAdditionalInfoDto
+        //          {
+        //              PartId = group.First().Part.PartId,
+        //              SKU = group.First().Part.SKU,
+        //              PartName = group.First().Part.PartName,
+        //              SellingPrice = group.First().Part.SellingPrice,
+        //              SupplierName = group.First().Part.Supplier.SupplierName,
+        //              WarehouseName = group.First().Warehouse.WarehouseName,
+        //              TotalQuantity = group.Sum(s => s.Quantity)
+        //          })
+        //          .Skip(pageSize * (pageNumber - 1))
+        //          .Take(pageSize)
+        //          .ToListAsync();
+
+        //        return (partsToReturn, paginationMetadata);
+
+        //    }
+
+        //}
+
         public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchAllPartsBySKU(string searchQuery, int pageSize, int pageNumber)
         {
             var collection = _context.Parts.AsQueryable();
-            var hasAnyMatchingSKU = await collection
-                 .AnyAsync(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-            if (!string.IsNullOrWhiteSpace(searchQuery) && hasAnyMatchingSKU)
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
                 searchQuery = searchQuery.Trim();
                 collection = collection
                     .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
 
-                var totalItemCount = await _context.Storages
-               .Join(
-                   _context.Parts,
-                   storage => storage.PartId,
-                   part => part.PartId,
-                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
-               )
-               .Where(result => result.SKU.Contains(searchQuery))
-               .Distinct()
-               .CountAsync();
-
-                var paginationMetadata = new PaginationMetadata(
-                    totalItemCount, pageSize, pageNumber);
-
-
-                var partsToReturn = await collection
-                  .Include(p => p.Supplier)
-                  .Include(p => p.Storages)
-                         .ThenInclude(s => s.Warehouse)
-                  .OrderBy(c => c.PartName)
-                  .SelectMany(p => p.Storages) // Flatten the Storages collection
-                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
-                  .Select(group => new PartForAdditionalInfoDto
-                  {
-                      PartId = group.First().Part.PartId,
-                      SKU = group.First().Part.SKU,
-                      PartName = group.First().Part.PartName,
-                      SellingPrice = group.First().Part.SellingPrice,
-                      SupplierName = group.First().Part.Supplier.SupplierName,
-                      WarehouseName = group.First().Warehouse.WarehouseName,
-                      TotalQuantity = group.Sum(s => s.Quantity)
-                  })
-                  .Skip(pageSize * (pageNumber - 1))
-                  .Take(pageSize)
-                  .ToListAsync();
-
-                return (partsToReturn, paginationMetadata);
+                if (!await collection.AnyAsync())
+                {
+                    return (null, null);
+                }
             }
-            else if (!string.IsNullOrWhiteSpace(searchQuery) && !hasAnyMatchingSKU)
-            {
-                return (null, null);
-            }
-            else
-            {
-                var totalItemCount = await _context.Storages
-               .Join(
-                   _context.Parts,
-                   storage => storage.PartId,
-                   part => part.PartId,
-                   (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
-               )
-               //.Where(result => result.SKU.Contains(searchQuery))
-               .Distinct()
-               .CountAsync();
 
-                var paginationMetadata = new PaginationMetadata(
-                    totalItemCount, pageSize, pageNumber);
+            var totalItemCount = await _context.Storages
+                .Join(
+                    _context.Parts,
+                    storage => storage.PartId,
+                    part => part.PartId,
+                    (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+                )
+                .Where(result => string.IsNullOrWhiteSpace(searchQuery) || result.SKU.Contains(searchQuery))
+                .Distinct()
+                .CountAsync();
 
+            var paginationMetadata = new PaginationMetadata(totalItemCount, pageSize, pageNumber);
 
-                var partsToReturn = await collection
-                  .Include(p => p.Supplier)
-                  .Include(p => p.Storages)
-                         .ThenInclude(s => s.Warehouse)
-                  .OrderBy(c => c.PartName)
-                  .SelectMany(p => p.Storages) // Flatten the Storages collection
-                  .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
-                  .Select(group => new PartForAdditionalInfoDto
-                  {
-                      PartId = group.First().Part.PartId,
-                      SKU = group.First().Part.SKU,
-                      PartName = group.First().Part.PartName,
-                      SellingPrice = group.First().Part.SellingPrice,
-                      SupplierName = group.First().Part.Supplier.SupplierName,
-                      WarehouseName = group.First().Warehouse.WarehouseName,
-                      TotalQuantity = group.Sum(s => s.Quantity)
-                  })
-                  .Skip(pageSize * (pageNumber - 1))
-                  .Take(pageSize)
-                  .ToListAsync();
+            var partsToReturn = await collection
+                .Include(p => p.Supplier)
+                .Include(p => p.Storages)
+                .ThenInclude(s => s.Warehouse)
+                .OrderBy(c => c.PartName)
+                .SelectMany(p => p.Storages)
+                .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
+                .Select(group => new PartForAdditionalInfoDto
+                {
+                    PartId = group.First().Part.PartId,
+                    SKU = group.First().Part.SKU,
+                    PartName = group.First().Part.PartName,
+                    SellingPrice = group.First().Part.SellingPrice,
+                    SupplierName = group.First().Part.Supplier.SupplierName,
+                    WarehouseName = group.First().Warehouse.WarehouseName,
+                    TotalQuantity = group.Sum(s => s.Quantity)
+                })
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
 
-                return (partsToReturn, paginationMetadata);
-
-            }
+            return (partsToReturn, paginationMetadata);
 
         }
+
+
+
 
         public async Task<(IEnumerable<PartForAdditionalInfoDto>, PaginationMetadata)> SearchSameCategoryPartsBySKU(string searchQuery, int pageSize, int pageNumber)
         {

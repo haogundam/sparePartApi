@@ -56,7 +56,7 @@ builder.Services.AddCors(options =>
         builder => builder.WithOrigins("http://localhost:4200")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
-                          .WithExposedHeaders("X-Pagination"));
+                          .WithExposedHeaders("X-Pagination","Paid-Pagination","Pending-Pagination"));
 
 
 });
