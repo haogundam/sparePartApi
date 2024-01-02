@@ -19,6 +19,9 @@ namespace SparePart.ModelAndPersistance.Repository
 
         Task<int> GetPartQuantity(int partId,string warehouseName);
 
+        Task<int> GetPartQuantityInAllStorages(int partId);
+
+
         Task<string> GetSupplierNameByPartId(int partId);
 
         Task<string> GetWarehouseNameByPartId(int partId);

@@ -22,14 +22,7 @@ namespace SparePart.ModelAndPersistance.Repository
         {
             if (quotationPart != null)
             {
-                // Retrieve the associated Storage
-                var storageToUpdate = await _context.Storages
-                    .OrderBy(s => s.WarehouseId)
-                    .FirstOrDefaultAsync(s => s.PartId == quotationPart.PartId);
-
-                if (storageToUpdate != null)
-                {
-                    int currentQuantity = storageToUpdate.Quantity;
+                    int currentQuantity = quotationPart.Quantity;
 
                     // Determine whether to increase or decrease storage quantity
                     if (quantity > currentQuantity)
@@ -42,11 +35,8 @@ namespace SparePart.ModelAndPersistance.Repository
                         // Increase storage quantity
                         await IncreaseStorageQuantity(quotationPart.PartId, currentQuantity - quantity);
                     }
-
-                    // Update the Storage quantity to the new quantity
-                    storageToUpdate.Quantity = quantity;
-                    await _context.SaveChangesAsync();
-                }
+                    else { }
+                    
             }
 
 

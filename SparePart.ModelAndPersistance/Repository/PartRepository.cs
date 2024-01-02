@@ -58,6 +58,23 @@ namespace SparePart.ModelAndPersistance.Repository
             return totalQuantity;
         }
 
+        public async Task<int> GetPartQuantityInAllStorages(int partId)
+        {
+            var parts = await _context.Parts
+                .Include(p => p.Storages)
+                .SelectMany(p => p.Storages) // Flatten the Storages collection
+                .Where(s => s.PartId == partId)
+                .GroupBy(s => new { s.PartId })
+                .Select(group => new
+                {
+                    TotalQuantity = group.Sum(s => s.Quantity)
+                })
+                .FirstOrDefaultAsync();
+
+            int totalQuantity = parts.TotalQuantity;
+
+            return totalQuantity;
+        }
 
 
         public async Task<string> GetSupplierNameByPartId(int partId)

@@ -52,7 +52,7 @@ namespace SparePart.Services
             return (newQuotePart,isQuantityValid: true, isPriceValid: true);
         }
 
-        public async Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart)
+        public async Task<(bool isQuantityValid, bool isPriceValid)> UpdateQuotationPartAsync(int quoteNo, QuotationPart quotationPart, QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
         {
             var part = await _partRepository.GetPartById(quotationPart.PartId);
             if (part == null)
@@ -61,27 +61,18 @@ namespace SparePart.Services
             }
 
             ////Check if the quantity is valid
-            //if (quotationPart.Quantity > await _partRepository.GetPartQuantity(part.PartId))
-            //{
-            //    return (isQuantityValid: false, isPriceValid: true);
-            //}
+            if (quotePartUpdatePriceQuantity.Quantity > await _partRepository.GetPartQuantityInAllStorages(part.PartId))
+            {
+                return (isQuantityValid: false, isPriceValid: true);
+            }
 
             // Check if the unit price is valid
-            if (quotationPart.UnitPrice < part.BuyingPrice)
+            if (quotePartUpdatePriceQuantity.UnitPrice < part.BuyingPrice)
             {
                 return (isQuantityValid: true, isPriceValid: false);
             }
 
-            // Both quantity and price are valid, add the QuotationPart
-            var quotePart = new QuotationPart
-            {
-                QuoteNo = quoteNo,
-                PartId = quotationPart.PartId,
-                Quantity = quotationPart.Quantity,
-                UnitPrice = quotationPart.UnitPrice,
-            };
-
-            await _quotationPartRepository.UpdateQuotationPart(quotePart);
+            //await _quotationPartRepository.UpdateQuotationPart(quotationPart);
 
             return (isQuantityValid: true, isPriceValid: true);
         }

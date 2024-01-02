@@ -43,7 +43,22 @@ namespace SparePart.Controllers
             _storageRepository = storageRepository;
         }
 
-        
+        // TESTING
+        [HttpGet("testing")]
+        public async Task<ActionResult<int>> Quantity(int partId) 
+        {
+            int quantity = await _partRepository.GetPartQuantityInAllStorages(partId);
+            return Ok(quantity);
+        }
+
+        [HttpGet("test")]
+        public async Task<ActionResult<int>> CurrentQuantity(int partId)
+        {
+            int quantity = await _partRepository.GetPartQuantityInAllStorages(partId);
+            return Ok(quantity);
+        }
+        // TTESTING
+
 
         [HttpGet]
         public async Task<ActionResult<QuotationPartResponse>> GetAllPartsInQuoationListById(int customerId, int quoteNo, int pageNumber)
@@ -194,10 +209,8 @@ namespace SparePart.Controllers
             }
 
             var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
-            quotationPart.Quantity = quotePartUpdatePriceQuantity.Quantity;
-            quotationPart.UnitPrice = quotePartUpdatePriceQuantity.UnitPrice;
 
-            var (quantityCheck, priceCheck) = await _quotePartService.UpdateQuotationPartAsync(quoteNo, quotationPart);
+            var (quantityCheck, priceCheck) = await _quotePartService.UpdateQuotationPartAsync(quoteNo, quotationPart, quotePartUpdatePriceQuantity);
 
             if (!quantityCheck && !priceCheck)
             {
@@ -212,21 +225,27 @@ namespace SparePart.Controllers
                 return BadRequest("The selling price is lower than the base price.");
             }
 
-            // edit total amount when add 
+            
+            // update storage quantity
+            await _storageRepository.UpdateStorageQuantity(quotationPart, quotePartUpdatePriceQuantity.Quantity);
+
+            quotationPart.Quantity = quotePartUpdatePriceQuantity.Quantity;
+            quotationPart.UnitPrice = quotePartUpdatePriceQuantity.UnitPrice;
+            await _quotationPartRepository.UpdateQuotationPart(quotationPart);
+           
+            // edit total amount
             double totalAmount = 0;
 
-            foreach (var part in quoteListByQuoteNo.QuotationParts)
+            var updatedQuoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(customerId, quoteNo);
+
+            foreach (var part in updatedQuoteListByQuoteNo.QuotationParts)
             {
                 double amount = part.UnitPrice * part.Quantity;
                 totalAmount += amount;
             }
 
-            quoteListByQuoteNo.TotalAmount = totalAmount;
-            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
-
-            // update storage quantity
-            var updateQuotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
-            await _storageRepository.DecreaseStorageQuantity(updateQuotationPart, quotePartUpdatePriceQuantity.Quantity);
+            updatedQuoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(updatedQuoteListByQuoteNo);
 
             return Ok($"PartID {quotationPart.PartId} - New Quantity : {quotationPart.Quantity} " +
                                                    $"- New UnitPrice    : {quotationPart.UnitPrice} ");
