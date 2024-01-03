@@ -31,6 +31,26 @@ namespace SparePart.Services
             return quoteList;
         }
 
+        public async Task<(QuotationPartResponseByQuoteNo, PaginationMetadata)> GetQuoteListByQuoteNo(int quoteNo,int pageSize,int pageNumber)
+        {
+            var customer = await _customerRepository.GetCustomerByQuoteNo(quoteNo);
+            var quoteList = await _quotationRepository.GetQuoteListByQuoteNo(customer.CustomerId, quoteNo);
+            var (quotationPart, partPaginationMetadata) = await _quotationPartRepository.GetAllQuotationPartFromQuoteNo(quoteNo, pageSize, pageNumber);
+
+            var response = new QuotationPartResponseByQuoteNo
+            {
+                CustomersInfo = _mapper.Map<CustomersInfo>(customer),
+                Status = quoteList.Status,
+                QuoteNo = quoteList.QuoteNo,
+                QuoteDate = quoteList.QuoteDate.ToString("yyy-MM-dd"),
+                TotalAmount = quoteList.TotalAmount,
+                Parts = _mapper.Map<ICollection<PartsInQuotationList>>(quotationPart),
+            };
+
+            return (response, partPaginationMetadata);
+
+        }
+
         public async Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageSize, int pageNumber)
         {
             var quoteList = await _quotationRepository.GetQuoteListByQuoteNo(customerId, quoteNo);

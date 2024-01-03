@@ -8,7 +8,7 @@ namespace SparePart.Services
     public interface IQuotationService
     {
         Task<QuotationList?> GetCustomerQuoteListByQuoteNo(int customerId, int quoteNo);
-
+        Task<(QuotationPartResponseByQuoteNo,PaginationMetadata)> GetQuoteListByQuoteNo(int quoteNo,int pageSize, int pageNumber);
         Task<(QuotationPartResponse, PaginationMetadata)> GetCustomerQuotationPartFromQuoteNo(int customerId, int quoteNo, int pageSize, int pageNumber);
 
         Task<(QuotationListResponse, PaginationMetadata, PaginationMetadata )> GetQuoteListByCustomerIdAndPageData(int customerId, int pageSize, int pendingPageNumber, int paidPageNumber);

@@ -100,6 +100,20 @@ namespace SparePart.ModelAndPersistance.Repository
                 .Where(c => c.CustomerId == customerId).FirstOrDefaultAsync();
         }
 
+        public async Task<Customer?> GetCustomerByQuoteNo(int quoteNo)
+        {
+            return await _context.Customers
+                .Join(_context.QuotationLists,
+                     customer => customer.CustomerId,
+                     quotation => quotation.CustomerId,
+                     (customer, quotation) => new { Customer = customer, Quotation = quotation })
+                 .Where(cq => cq.Quotation.QuoteNo == quoteNo)
+                    .Select(cq => cq.Customer)
+                    .FirstOrDefaultAsync();
+        }
+
+
+
         public async Task<bool> CustomerExistsAsync(int customerId)
         {
             var customer = await _context.Customers.AnyAsync(c => c.CustomerId == customerId);
@@ -109,8 +123,6 @@ namespace SparePart.ModelAndPersistance.Repository
             }
             return true;
         }
-
-
 
         public async Task<(IEnumerable<Customer>, PaginationMetadata)> SearchCustomerByCustomerName(string? searchQuery, int pageSize, int pageNumber)
         {

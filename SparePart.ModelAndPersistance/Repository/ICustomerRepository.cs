@@ -15,7 +15,7 @@ namespace SparePart.ModelAndPersistance.Repository
         Task<(IEnumerable<Customer>, PaginationMetadata)> GetAllCustomers(int pageSize, int pageNumber);
         Task<(IEnumerable<Customer>, PaginationMetadata)> SearchCustomerById(string? searchQuery, int pageSize, int pageNumber);
         Task<Customer?> GetCustomerByCustomerId(int customerId);
-
+        Task<Customer?> GetCustomerByQuoteNo(int quoteNo);
         Task<bool> CustomerExistsAsync(int customerId);
         Task<(IEnumerable<Customer>, PaginationMetadata)> SearchCustomerByCustomerName(string? searchQuery, int pageSize, int pageNumber);
     }

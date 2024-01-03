@@ -27,7 +27,6 @@ namespace SparePart.ModelAndPersistance.Repository
 
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetQuoteListByCustomerId(int customerId, int pageSize, int pageNumber);
 
-
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> GetQuoteListByCustomerIdAndStatus(int customerId, int pageSize, int pageNumber, Status status);
        
         Task<(IEnumerable<QuotationList>, PaginationMetadata)> SearchQuoteListByCustomerNameAndStatus(string? searchQuery, int pageSize, int pageNumber, Status status);
