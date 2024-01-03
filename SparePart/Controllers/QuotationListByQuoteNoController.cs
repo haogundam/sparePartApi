@@ -9,7 +9,7 @@ using SparePart.Services;
 namespace SparePart.Controllers
 {
     [Route("api/quotations")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class QuotationListByQuoteNoController : ControllerBase
     {

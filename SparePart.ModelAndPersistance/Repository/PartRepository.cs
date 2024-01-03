@@ -322,9 +322,16 @@ namespace SparePart.ModelAndPersistance.Repository
                     _context.Parts,
                     storage => storage.PartId,
                     part => part.PartId,
-                    (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU }
+                    (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU, storage.Quantity }
                 )
                 .Where(result => string.IsNullOrWhiteSpace(searchQuery) || result.SKU.Contains(searchQuery))
+                .GroupBy(s => new { s.PartId, s.WarehouseName })
+                .Select(group => new
+                {
+                    PartId = group.Key,
+                    TotalQuantity = group.Sum(s => s.Quantity)
+                })
+                 .Where(result => result.TotalQuantity > 0) // Filter where TotalQuantity is greater than 0
                 .Distinct()
                 .CountAsync();
 
@@ -347,6 +354,7 @@ namespace SparePart.ModelAndPersistance.Repository
                     WarehouseName = group.First().Warehouse.WarehouseName,
                     TotalQuantity = group.Sum(s => s.Quantity)
                 })
+                .Where(part => part.TotalQuantity > 0)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
@@ -450,9 +458,16 @@ namespace SparePart.ModelAndPersistance.Repository
                         collection,
                         storage => storage.PartId,
                         part => part.PartId,
-                        (storage, part) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU }
+                        (storage, part) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU , storage.Quantity}
                     )
                     .Where(result => !result.SKU.Contains(searchQuery))
+                    .GroupBy(s => new { s.PartId, s.WarehouseName })
+                    .Select(group => new
+                    {
+                        PartId = group.Key,
+                        TotalQuantity = group.Sum(s => s.Quantity)
+                    })
+                     .Where(result => result.TotalQuantity > 0) // Filter where TotalQuantity is greater than 0
                     .Distinct()
                     .CountAsync();
 
@@ -472,7 +487,7 @@ namespace SparePart.ModelAndPersistance.Repository
                     .SelectMany(p => p.Storages)
                     .GroupBy(s => new { s.PartId, s.Warehouse.WarehouseId })
                     .Select(group => new PartForAdditionalInfoDto
-                    {
+                    {  
                         PartId = group.First().Part.PartId,
                         SKU = group.First().Part.SKU,
                         PartName = group.First().Part.PartName,
@@ -481,6 +496,7 @@ namespace SparePart.ModelAndPersistance.Repository
                         WarehouseName = group.First().Warehouse.WarehouseName,
                         TotalQuantity = group.Sum(s => s.Quantity)
                     })
+                    .Where(part => part.TotalQuantity > 0)
                     .Skip(pageSize * (pageNumber - 1))
                     .Take(pageSize)
                     .ToListAsync();
