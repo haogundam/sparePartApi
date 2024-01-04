@@ -12,6 +12,7 @@ namespace SparePart.ModelAndPersistance.Models
         public string SKU { get; set; }
         public string PartName { get; set; }
         public double SellingPrice { get; set; }
+        public double BuyingPrice { get; set; }
         public int TotalQuantity { get; set; }
         public string SupplierName { get; set; }
         public string WarehouseName { get; set; }

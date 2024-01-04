@@ -15,13 +15,7 @@ namespace SparePart.Controllers
     {
 
         private readonly IQuotationService _quotationService;
-        private readonly ICustomerService _customerService;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IQuotePartService _quotePartService;
-        private readonly IPartRepository _partRepository;
-        private readonly IStorageRepository _storageRepository;
         private readonly IQuotationRepository _quotationRepository;
-        private readonly IQuotationPartRepository _quotationPartRepository;
 
         const int PageSize = 10;
 
@@ -41,12 +35,32 @@ namespace SparePart.Controllers
             }
 
             var (quotePart,paginationMetadata) = await _quotationService.GetQuoteListByQuoteNo(quoteNo,PageSize,pageNumber);
+            var quoteListByQuoteNo = await _quotationService.GetCustomerQuoteListByQuoteNo(quotePart.CustomersInfo.CustomerId, quoteNo);
+
+            double totalAmount = 0;
+
+            for (int currentPage = 1; currentPage <= paginationMetadata.TotalPageCount; currentPage++)
+            {
+                var (getQuotationPart, _) = await _quotationService.GetQuoteListByQuoteNo(quoteNo, PageSize, pageNumber);
+
+                foreach (var part in getQuotationPart.Parts)
+                {
+                    double amount = part.UnitPrice * part.Quantity;
+                    totalAmount += amount;
+                }
+            }
+
+            quoteListByQuoteNo.TotalAmount = totalAmount;
+            await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
+
+            (quotePart, paginationMetadata) = await _quotationService.GetQuoteListByQuoteNo(quoteNo, PageSize, pageNumber);
 
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
                 pageNumber = paginationMetadata.TotalPageCount;
                 (quotePart, paginationMetadata) = await _quotationService.GetQuoteListByQuoteNo(quoteNo, PageSize, pageNumber);
             }
+
             Response.Headers.Add("X-Pagination",
                  System.Text.Json.JsonSerializer.Serialize(paginationMetadata));
 

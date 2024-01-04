@@ -79,6 +79,8 @@ namespace SparePart.Controllers
             quoteListByQuoteNo.TotalAmount = totalAmount;
             await _quotationRepository.UpdateQuotationList(quoteListByQuoteNo);
 
+            (quotationPart, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, pageNumber);
+
             if (quotationPart == null || paginationMetadata == null)
             {
                     Response.Headers.Add("X-Pagination",
@@ -160,7 +162,6 @@ namespace SparePart.Controllers
 
         }
 
-        //// TODO total amount not up to date
         [HttpPatch("quoteparts/{quotePartId}")]
         public async Task<ActionResult> UpdateQuantityAndSellingPrice(int customerId, int quoteNo, int quotePartId, [FromBody] QuotePartUpdatePriceQuantity quotePartUpdatePriceQuantity)
         {

@@ -350,6 +350,7 @@ namespace SparePart.ModelAndPersistance.Repository
                     SKU = group.First().Part.SKU,
                     PartName = group.First().Part.PartName,
                     SellingPrice = group.First().Part.SellingPrice,
+                    BuyingPrice = group.First().Part.BuyingPrice,
                     SupplierName = group.First().Part.Supplier.SupplierName,
                     WarehouseName = group.First().Warehouse.WarehouseName,
                     TotalQuantity = group.Sum(s => s.Quantity)
@@ -492,6 +493,7 @@ namespace SparePart.ModelAndPersistance.Repository
                         SKU = group.First().Part.SKU,
                         PartName = group.First().Part.PartName,
                         SellingPrice = group.First().Part.SellingPrice,
+                        BuyingPrice = group.First().Part.BuyingPrice,
                         SupplierName = group.First().Part.Supplier.SupplierName,
                         WarehouseName = group.First().Warehouse.WarehouseName,
                         TotalQuantity = group.Sum(s => s.Quantity)
