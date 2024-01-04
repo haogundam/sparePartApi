@@ -126,6 +126,7 @@ namespace SparePart.ModelAndPersistance.Repository
 
         public async Task<(IEnumerable<Customer>, PaginationMetadata)> SearchCustomerByCustomerName(string? searchQuery, int pageSize, int pageNumber)
         {
+
             var collection = _context.Customers.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchQuery))

@@ -12,5 +12,7 @@ namespace SparePart.ModelAndPersistance.Repository
 
         Task<User> GetEmail(string email);
 
+        Task<User> GetUserByRefreshTokenAsync(string refreshToken);
+        void UpdateUser(User user);
     }
 }

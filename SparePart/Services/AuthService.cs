@@ -34,7 +34,7 @@ namespace SparePart.Services
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddDays(14),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -80,6 +80,19 @@ namespace SparePart.Services
             }
 
             return true;
+        }
+
+
+        public async Task<User> GetUserByRefreshToken(string refreshToken)
+        {
+            // Implement the logic to retrieve a user by refresh token from the repository or context
+            return await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
+        }
+
+        public void UpdateUser(User user)
+        {
+            // Implement the logic to update the user in the repository or context
+            _userRepository.UpdateUser(user);
         }
     }
 }

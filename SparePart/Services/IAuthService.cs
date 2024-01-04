@@ -16,5 +16,7 @@ namespace SparePart.Services
 
         Task<bool> UserExists(string email);
 
+        Task<User> GetUserByRefreshToken(string refreshToken);
+        void UpdateUser(User user);
     }
 }
