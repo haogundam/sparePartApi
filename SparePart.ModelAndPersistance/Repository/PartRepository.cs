@@ -309,7 +309,7 @@ namespace SparePart.ModelAndPersistance.Repository
             {
                 searchQuery = searchQuery.Trim();
                 collection = collection
-                    .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+                    .Where(a => a.SKU != null && a.SKU.StartsWith(searchQuery));
 
                 if (!await collection.AnyAsync())
                 {
@@ -324,7 +324,7 @@ namespace SparePart.ModelAndPersistance.Repository
                     part => part.PartId,
                     (storage, part) => new { storage.PartId, WarehouseName = storage.Warehouse.WarehouseName, SKU = part.SKU, storage.Quantity }
                 )
-                .Where(result => string.IsNullOrWhiteSpace(searchQuery) || result.SKU.Contains(searchQuery))
+                .Where(result => string.IsNullOrWhiteSpace(searchQuery) || result.SKU.StartsWith(searchQuery))
                 .GroupBy(s => new { s.PartId, s.WarehouseName })
                 .Select(group => new
                 {
@@ -447,12 +447,12 @@ namespace SparePart.ModelAndPersistance.Repository
                 searchQuery = searchQuery.Trim();
                 var matchingSKUs = collection
                     .Include(a => a.Category)
-                    .Where(a => a.SKU != null && a.SKU.Contains(searchQuery));
+                    .Where(a => a.SKU != null && a.SKU.StartsWith(searchQuery));
 
                 var categoryIds = matchingSKUs.Select(a => a.Category.CategoryId).Distinct();
                 collection = collection
                     .Include(a => a.Category)
-                    .Where(a => categoryIds.Contains(a.Category.CategoryId) && !a.SKU.Contains(searchQuery));
+                    .Where(a => categoryIds.Contains(a.Category.CategoryId) && !a.SKU.StartsWith(searchQuery));
 
                 var totalItemCount = await _context.Storages
                     .Join(
@@ -461,7 +461,7 @@ namespace SparePart.ModelAndPersistance.Repository
                         part => part.PartId,
                         (storage, part) => new { part.PartId, storage.Warehouse.WarehouseName, part.SKU , storage.Quantity}
                     )
-                    .Where(result => !result.SKU.Contains(searchQuery))
+                    .Where(result => !result.SKU.StartsWith(searchQuery))
                     .GroupBy(s => new { s.PartId, s.WarehouseName })
                     .Select(group => new
                     {

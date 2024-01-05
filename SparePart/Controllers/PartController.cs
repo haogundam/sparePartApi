@@ -30,7 +30,6 @@ namespace SparePart.Controllers
             var (parts, paginationMetadata) = await _partRepository.SearchAllPartsBySKU(sku, 4, pageNumber);
             if (parts == null) { return NotFound(); }
 
-
             if (pageNumber > paginationMetadata.TotalPageCount || pageNumber < 1)
             {
                 pageNumber = paginationMetadata.TotalPageCount;

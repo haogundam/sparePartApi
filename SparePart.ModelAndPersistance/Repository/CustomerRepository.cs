@@ -133,7 +133,7 @@ namespace SparePart.ModelAndPersistance.Repository
             {
                 searchQuery = searchQuery.Trim();
                 collection = collection
-                    .Where(a => a.CustomerName.Contains(searchQuery));
+                    .Where(a => a.CustomerName.StartsWith(searchQuery));
             }
 
             var totalItemCount = await collection.CountAsync();
@@ -148,7 +148,6 @@ namespace SparePart.ModelAndPersistance.Repository
 
             return (partsToReturn, paginationMetadata);
         }
-
 
     }
 }

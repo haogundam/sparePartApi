@@ -126,6 +126,11 @@ namespace SparePart.Controllers
                 return BadRequest("No Warehouse Name is provided!!");
             }
 
+            if (quoteListByQuoteNo.Status == Status.paid)
+            {
+                return BadRequest("Completed Quotation List cannot be edit!!");
+            }
+
             var (newQuotationPart,quantityCheck, priceCheck) = await _quotePartService.AddQuotationPartAsync(quoteNo, quotePartAdd);
 
             if (!quantityCheck && !priceCheck)
@@ -189,6 +194,10 @@ namespace SparePart.Controllers
                 return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
             }
 
+            if (quoteListByQuoteNo.Status == Status.paid)
+            {
+                return BadRequest("Completed Quotation List cannot be edit!!");
+            }
 
             if (quotePartUpdatePriceQuantity.Quantity <= 0)
             {
@@ -264,6 +273,11 @@ namespace SparePart.Controllers
                 return NotFound($"This QuotePart {quotePartId} is not in QuoteList {quoteNo}");
             }
 
+            if (quoteListByQuoteNo.Status == Status.paid)
+            {
+                return BadRequest("Completed Quotation List cannot be edit!!");
+            }
+
             var quotationPart = await _quotationPartRepository.GetQuotationPartById(quotePartId);
 
             // increase storage quantity
@@ -302,6 +316,11 @@ namespace SparePart.Controllers
                 return NotFound();
             }
 
+            if (quoteListByQuoteNo.Status == Status.paid)
+            {
+                return BadRequest("Completed Quotation List cannot be submit!!");
+            }
+
             await _quotationService.SubmitQuotationList(quoteListByQuoteNo);
 
             return Ok("Submitted!");
@@ -320,6 +339,11 @@ namespace SparePart.Controllers
             if (quoteListByQuoteNo == null)
             {
                 return NotFound($"Customer ID {customerId} dont have this QuoteNo {quoteNo}");
+            }
+
+            if (quoteListByQuoteNo.Status == Status.paid)
+            {
+                return BadRequest("Completed Quotation List cannot be edit!!");
             }
 
             var (_, paginationMetadata) = await _quotationService.GetCustomerQuotationPartFromQuoteNo(customerId, quoteNo, PageSize, 1);
